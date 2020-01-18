@@ -21,9 +21,26 @@ tutorial - https://flask.palletsprojects.com/en/1.1.x/quickstart/
 
 - Be in the root directory of the repository when you run these commands
 - Note the setting of the FLASK_ENV variable enables debug mode
+
+#### Linux instructions
 ```bash
 export FLASK_APP=searchapp/searchapp.py
 export FLASK_ENV=development
+flask run
+```
+
+#### Windows instructions
+
+##### Powershell Instructions
+```
+$env:FLASK_APP = "hello.py"
+$env:FLASK_ENV=development
+flask run
+```
+##### CMD Instructions
+```
+set FLASK_APP = "hello.py"
+set FLASK_ENV=development
 flask run
 ```
 
