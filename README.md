@@ -53,6 +53,12 @@ set-executionpolicy remotesigned
 
 Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-powershell-scripts
 
+### Deactivating a venv
+Run the following command
+```
+deactivate
+```
+
 ## Running the application
 Reference - https://flask.palletsprojects.com/en/1.1.x/quickstart/
 
