@@ -14,6 +14,8 @@ Stuff that would be nice to have in a wiki
 Reference: https://realpython.com/python-virtual-environments-a-primer/
 
 #### Linux instructions
+Run the following commands
+- Note that if you are using the fish shell to use "activate.fish" instead of "activate"
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -21,14 +23,15 @@ pip install -r requirements.txt
 ```
 
 #### Windows instructions
-
+Run the following commands
 ```
 py -3 -m venv venv
 venv\Scripts\activate
 pip3 install -r requirements.txt
 ```
-```
+
 If you encounter the following error or something similar:
+```
 venv\Scripts\activate : File C:\Users\Raymo\Desktop\blah\search-engine\venv\Scripts\Activate.ps1 cannot be
 loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies
 at https:/go.microsoft.com/fwlink/?LinkID=135170.
@@ -38,22 +41,23 @@ At line:1 char:1
     + CategoryInfo          : SecurityError: (:) [], PSSecurityException
     + FullyQualifiedErrorId : UnauthorizedAccess
 ```
-Open PowerShell in Administrator mode
-Input this in the prompt
+1. Open PowerShell in Administrator mode
+2. Input this in the prompt
 ```
 set-executionpolicy remotesigned
 ```
-Say yes
+3. Say yes
 
 Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-powershell-scripts
 
-### Running the application
+## Running the application
 Reference - https://flask.palletsprojects.com/en/1.1.x/quickstart/
 
 - Be in the root directory of the repository when you run these commands
 - Note the setting of the FLASK_ENV variable enables debug mode
 
 #### Linux instructions
+Run the following commands
 ```bash
 export FLASK_APP=searchapp/searchapp.py
 export FLASK_ENV=development
@@ -63,12 +67,14 @@ flask run
 #### Windows instructions
 
 ##### Powershell Instructions
+Run the following commands
 ```
 $env:FLASK_APP = "searchapp/searchapp.py"
 $env:FLASK_ENV = "development"
 flask run
 ```
 ##### CMD Instructions
+Run the following commands
 ```
 set FLASK_APP=searchapp/searchapp.py
 set FLASK_ENV=development
