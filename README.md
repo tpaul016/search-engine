@@ -1,7 +1,7 @@
 # search-engine
 
-Assumptions
-- Git is installed 
+Assumptions prior to install
+- Git is installed and accessible from the path or Git Bash (Windows)
 - Python 3 is installed and accessible from the path
 
 # Documentation
@@ -10,8 +10,11 @@ Stuff that would be nice to have in a wiki
 ## Installation 
 
 ### Setting up a venv and activating it
-
-Reference: https://realpython.com/python-virtual-environments-a-primer/
+- Reference: https://realpython.com/python-virtual-environments-a-primer/
+- You can see your installed requirements from pip using the command
+```bash
+pip freeze
+```
 
 #### Linux instructions
 Run the following commands
