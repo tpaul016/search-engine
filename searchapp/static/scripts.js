@@ -10,6 +10,8 @@ var spellDataList = document.getElementById('docList');
 
 var divDocList = document.getElementById('docList');
 
+var baseURL = "http://localhost:5000/"
+
 /*
 * Handle Query submission
 * EventListener for query form
@@ -18,7 +20,7 @@ var divDocList = document.getElementById('docList');
 */
 function querySubmit(ev) {
     ev.preventDefault();
-    fetch("http://localhost:5000/docs", {
+    fetch(baseURL + "docs", {
         method: 'POST',
         body: new FormData(this)
     })
@@ -37,9 +39,10 @@ function querySubmit(ev) {
             newDiv.setAttribute("class", "doc")
             divDocList.appendChild(newDiv)
 
-            pDocId = document.createElement("p")
-            pDocId.innerHTML = "DocId: " + doc["docId"]
-            newDiv.appendChild(pDocId)
+            aDocId = document.createElement("a")
+            aDocId.setAttribute("href", baseURL + "docs/" + doc["docId"])
+            aDocId.innerHTML = "DocId: " + doc["docId"]
+            newDiv.appendChild(aDocId)
 
             pExcerpt = document.createElement("p")
             pExcerpt.innerHTML ="Description: " + doc["excerpt"]
@@ -71,7 +74,7 @@ function spellCheck(ev) {
     console.log("Spell Check trigger")
     var fd = new FormData()
     fd.append('query', ev.target.value)
-    fetch("http://localhost:5000/spell", {
+    fetch(baseURL + "spell", {
         method: 'POST',
         body: fd
     })
