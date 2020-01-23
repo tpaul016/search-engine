@@ -5,11 +5,17 @@
 * https://dev.to/stephenafamo/how-to-create-an-autocomplete-input-with-plain-javascript
 */
 
-// 
-
+// Bound to the inputQuery input
 var spellDataList = document.getElementById('docList');
 
-// Handle Query submissions
+var divDocList = document.getElementById('docList');
+
+/*
+* Handle Query submission
+* EventListener for query form
+* Posts data and transforms documents to elements that are then
+* appended to the docList div 
+*/
 function querySubmit(ev) {
     ev.preventDefault();
     fetch("http://localhost:5000/docs", {
@@ -17,14 +23,35 @@ function querySubmit(ev) {
         body: new FormData(this)
     })
     .then(response => {
+        console.log("Query response received")
         return response.json();
     })
     .then(data => {
-        console.log("Query: Received data")
-        console.log(data)
+        // Clear list
+        while (divDocList.hasChildNodes()) {
+            divDocList.removeChild(divDocList.firstChild);
+        }
+
+        data.forEach(doc => {
+            newDiv = document.createElement("div")
+            newDiv.setAttribute("class", "doc")
+            divDocList.appendChild(newDiv)
+
+            pDocId = document.createElement("p")
+            pDocId.innerHTML = "DocId: " + doc["docId"]
+            newDiv.appendChild(pDocId)
+
+            pExcerpt = document.createElement("p")
+            pExcerpt.innerHTML ="Description: " + doc["excerpt"]
+            newDiv.appendChild(pExcerpt)
+
+            pScore = document.createElement("p")
+            pScore.innerHTML = "Score: " + doc["score"]
+            newDiv.appendChild(pScore)
+        })
     })
     .catch(error => {
-        console.log("Spell Check: Request failed", error)
+        console.log("Query: Request failed", error)
     });
 }
 
@@ -34,7 +61,12 @@ form.addEventListener('submit', querySubmit);
 
 var spellDataList = document.getElementById('spellList');
 
-// Handle Spell check
+/* 
+* Handle Spell check
+* EventListener for inputQuery input
+* Posts query then transforms returned data to option elements that are appended 
+* to a datalist that is bound to the input.
+*/
 function spellCheck(ev) {
     console.log("Spell Check trigger")
     var fd = new FormData()
@@ -44,12 +76,15 @@ function spellCheck(ev) {
         body: fd
     })
     .then(response => {
+        console.log("Spell Check response received")
         return response.json();
     })
     .then(data => {
+        // Clear list
         while (spellDataList.hasChildNodes()) {
             spellDataList.removeChild(spellDataList.firstChild);
         }
+
         data.forEach(correction => {
             var option = document.createElement("option")
             option.setAttribute("value", correction)
