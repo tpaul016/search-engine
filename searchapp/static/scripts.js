@@ -1,5 +1,13 @@
-// https://developers.google.com/web/updates/2015/03/introduction-to-fetch
-// https://github.com/pallets/flask/blob/master/examples/javascript/js_example/templates/fetch.html
+/*
+* Inspired by:
+* https://developers.google.com/web/updates/2015/03/introduction-to-fetch
+* https://github.com/pallets/flask/blob/master/examples/javascript/js_example/templates/fetch.html
+* https://dev.to/stephenafamo/how-to-create-an-autocomplete-input-with-plain-javascript
+*/
+
+// 
+
+var spellDataList = document.getElementById('docList');
 
 // Handle Query submissions
 function querySubmit(ev) {
@@ -28,7 +36,6 @@ var spellDataList = document.getElementById('spellList');
 
 // Handle Spell check
 function spellCheck(ev) {
-    //ev.preventDefault();
     console.log("Spell Check trigger")
     var fd = new FormData()
     fd.append('query', ev.target.value)
@@ -43,11 +50,11 @@ function spellCheck(ev) {
         while (spellDataList.hasChildNodes()) {
             spellDataList.removeChild(spellDataList.firstChild);
         }
-        for(correction of data){
+        data.forEach(correction => {
             var option = document.createElement("option")
             option.setAttribute("value", correction)
             spellDataList.appendChild(option)
-        }
+        })
     })
     .catch(error => {
         console.log("Spell Check: Request failed", error)
