@@ -7,9 +7,9 @@
 </head>
 
 <body>
-    <form id="query", autocomplete="off">
+    <form id="query" autocomplete="off">
         <h1>Query</h1>
-            <input type="text" name="query" list="spellCheck"><br>
+            <input id="inputQuery" type="text" name="query" list="spellList"><br>
         <h1>Model</h1>
             <input type="radio" name="model" value="boolean" checked>Boolean Retrieval<br>
             <input type="radio" name="model" value="vsm">Vector Space Model<br>
@@ -19,8 +19,7 @@
         <input type="submit" value="Submit">
     </form>
 
-    <datalist id="spellList">
-    </datalist>
+    <datalist id="spellList"></datalist>
 </body>
 
 

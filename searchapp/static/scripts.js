@@ -24,23 +24,38 @@ function querySubmit(ev) {
 var form = document.getElementById('query');
 form.addEventListener('submit', querySubmit);
 
+var spellDataList = document.getElementById('spellList');
+
 // Handle Spell check
-function spellCheck () {
+function spellCheck(ev) {
     //ev.preventDefault();
+    console.log("Spell Check trigger")
+    var fd = new FormData()
+    fd.append('query', ev.target.value)
     fetch("http://localhost:5000/spell", {
         method: 'POST',
-        body: new FormData(this)
+        body: fd
     })
     .then(response => {
         return response.json();
     })
     .then(data => {
-        console.log("Spell Check: Received data")
-        console.log(data)
+        while (spellDataList.hasChildNodes()) {
+            spellDataList.removeChild(spellDataList.firstChild);
+        }
+        for(correction of data){
+            var option = document.createElement("option")
+            option.setAttribute("value", correction)
+            spellDataList.appendChild(option)
+        }
     })
     .catch(error => {
         console.log("Spell Check: Request failed", error)
     });
+    
 }
 
-var spellDataList = document.getElementById('spellList');
+// Bind form to spellCheck()
+var inputQuery = document.getElementById('inputQuery');
+inputQuery.addEventListener('input', spellCheck);
+
