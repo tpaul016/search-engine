@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Search Engine</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles.css') }}">
+</head>
+
+<body>
+    <form id="query" autocomplete="off">
+        <h1>Query</h1>
+            <input id="inputQuery" type="text" name="query" list="spellList"><br>
+        <h1>Model</h1>
+            <input type="radio" name="model" value="boolean" checked>Boolean Retrieval<br>
+            <input type="radio" name="model" value="vsm">Vector Space Model<br>
+        <h1>Collection</h1>
+            <input type="radio" name="collection" value="courses" checked>Courses<br>
+            <input type="radio" name="collection" value="reuters">Reuters<br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <datalist id="spellList"></datalist>
+
+    <div id="docList"></div>
+</body>
+
+</html>
