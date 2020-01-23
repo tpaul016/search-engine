@@ -1,16 +1,21 @@
-from flask import Flask
-from flask import render_template
+from flask import Flask, render_template, jsonify, request
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    query = ''
-    model = ''
-    collection = ''
-    return render_template('index.html', query=query)
+    return render_template('index.html')
 
-@app.route('/docs/docId')
-def get_document(docId):
-    return docId
+@app.route('/docs', methods=['POST'])
+def handleQuery():
+    print(request.form)
+    query = request.form["query"]
+    model = request.form["model"]
+    collection = request.form["collection"]
+    return jsonify(blah="blah")
 
+@app.route('/spell', methods=['POST'])
+def handleQSpell():
+    print(request.form)
+    query = request.form["query"]
+    return jsonify(blip="blop")

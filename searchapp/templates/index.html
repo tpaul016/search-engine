@@ -3,10 +3,72 @@
 <head>
     <title>Search Engine</title>
 </head>
-<body>
-    <h1>Query</h1>
-    <h1>Model</h1>
-    <h1>Collection</h1>
 
+<body>
+    <form id="query", autocomplete="off">
+        <h1>Query</h1>
+            <input type="text" name="query" list="spellCheck"><br>
+        <h1>Model</h1>
+            <input type="radio" name="model" value="boolean" checked>Boolean Retrieval<br>
+            <input type="radio" name="model" value="vsm">Vector Space Model<br>
+        <h1>Collection</h1>
+            <input type="radio" name="collection" value="courses" checked>Courses<br>
+            <input type="radio" name="collection" value="reuters">Reuters<br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <datalist id="spellList">
+    </datalist>
 </body>
+
+<script>
+    // https://developers.google.com/web/updates/2015/03/introduction-to-fetch
+    // https://github.com/pallets/flask/blob/master/examples/javascript/js_example/templates/fetch.html
+
+    // Handle Query submissions
+    function querySubmit(ev) {
+        ev.preventDefault();
+        fetch("http://localhost:5000/docs", {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            console.log("Query: Received data")
+            console.log(data)
+        })
+        .catch(error => {
+            console.log("Spell Check: Request failed", error)
+        });
+    }
+
+    // Bind form to querySubmit()
+    var form = document.getElementById('query');
+    form.addEventListener('submit', querySubmit);
+
+    // Handle Spell check
+    function spellCheck () {
+        //ev.preventDefault();
+        fetch("http://localhost:5000/spell", {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            console.log("Spell Check: Received data")
+            console.log(data)
+        })
+        .catch(error => {
+            console.log("Spell Check: Request failed", error)
+        });
+    }
+
+    var spellDataList = document.getElementById('spellList');
+
+</script>
+
 </html>
