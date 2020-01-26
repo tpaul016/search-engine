@@ -1,9 +1,16 @@
 from flask import Flask, render_template, jsonify, request
+from .dictbuild import dictBuilder
+import nltk
 app = Flask(__name__)
 
 if app.config['DEBUG'] == True:
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+# Necessary for word_tokenize()
+nltk.download('punkt')
+
+# Build Dictionary
+dictBuilder.buildDict(True, True, True)
 
 @app.route('/')
 def index():
