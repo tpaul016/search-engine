@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, request
-from .dictbuild import dictBuilder
+from .indexAndDict import indexAndDictBuilder
 import nltk
 app = Flask(__name__)
 
