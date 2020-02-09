@@ -14,7 +14,7 @@ def buildDict(stopword, stem, norm):
     addToDict = False
     appendToDocs = False
     try:
-        chdir("./searchapp/corPreProc/corpus")
+        chdir("./searchapp/cor_pre_proc/corpus")
         fileNameList = listdir()
         with fileinput.input(fileNameList) as files:
             for f in files:

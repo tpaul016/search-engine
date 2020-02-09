@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, request
-from .indexAndDict import indexAndDictBuilder
+from .index_and_dict import indexAndDictBuilder
 import nltk
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ if app.config['DEBUG'] == True:
 nltk.download('punkt')
 
 # Build Dictionary
-dictBuilder.buildDict(True, True, True)
+indexAndDictBuilder.buildDict(True, True, True)
 
 @app.route('/')
 def index():
