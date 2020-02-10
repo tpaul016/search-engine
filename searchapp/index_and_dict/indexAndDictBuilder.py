@@ -38,10 +38,7 @@ def buildIndex(stopword, stem, norm):
                     # inverIndex = termList + tokenizer.tokenize(desc)
                     tokens = nltk.word_tokenize(desc)
                     for token in tokens:
-                        #if token == "within":
-                        #    breakpoint()
 
-                        #Perform stopword, normalization, casefolding, stemming somewhere in this loop
                         if len(token) == 1:
                             if token in string.punctuation:
                                 continue
@@ -58,12 +55,17 @@ def buildIndex(stopword, stem, norm):
                             else:
                                 lengthOfDocList = len(inverIndex[token]["docs"]) - 1
                                 inverIndex[token]["docs"][lengthOfDocList]["tf"] += 1
-
     finally:
         chdir(currDir)
+
+    # Sort each postings list
+    for token in inverIndex:
+        # Inspired from https://stackoverflow.com/questions/72899/how-do-i-sort-a-list-of-dictionaries-by-a-value-of-the-dictionary
+        inverIndex[token]["docs"] = sorted(inverIndex[token]["docs"], key=lambda k: k['name'])
+
     logging.debug(inverIndex)
 
-    # Writing JSON content
+    # Serialize to JSON 
     with open('index.json', 'w') as f:
         json.dump(inverIndex, f, indent=2, sort_keys=True)
 
