@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 import nltk
+#from .index_and_dict import indexAccess
 app = Flask(__name__)
 
 if app.config['DEBUG'] == True:
@@ -37,6 +38,7 @@ def getDocument(docId):
 
 @app.route('/docs', methods=['POST'])
 def handleQuery():
+
     print(request.form)
     query = request.form["query"]
     model = request.form["model"]
