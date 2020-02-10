@@ -3,6 +3,7 @@ import re
 def hyphenRemoval(token):
     word = token.replace("-", "")
 
+    # Don't want a word that's only hyphens
     if len(word) == 0:
         return(word, False)
     else:
@@ -19,8 +20,22 @@ def hyphenRemoval(token):
 
 def periodRemoval(token):
     word = token.replace(".", "")
-
+    
+    # Don't want a word that's only hyphens
     if len(word) == 0:
         return(word, False)
     else:
         return(word, True)
+
+def normalize(token):
+    newToken, ok = hyphenRemoval(token)
+    if not ok:
+        return newToken, False
+    else:
+        return newToken, True
+
+    newToken, okPeriod = periodRemoval(token)
+    if not ok:
+        return newToken, False
+    else:
+        return newToken, True
