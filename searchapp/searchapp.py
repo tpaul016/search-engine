@@ -38,6 +38,8 @@ def getDocument(docId):
 
 @app.route('/docs', methods=['POST'])
 def handleQuery():
+    #index = indexAccess.getInvertedIndex()
+    #breakpoint()
 
     print(request.form)
     query = request.form["query"]

@@ -6,7 +6,36 @@ import fileinput
 import string
 import logging
 import json
+import re # RMME
+#from ... langproc import langProcess
 logging.basicConfig(filename='index.log',level=logging.DEBUG)
+
+nltk.download('stopwords') #TODO: should move to application setup
+
+def hyphenRemoval(token):
+    word = token.replace("-", "")
+
+    if len(word) == 0:
+        return(word, False)
+    else:
+        return(word, True)
+
+    # Matches alphanumericString-alphanumericString
+    #matches = re.findall('([a-zA-Z0-9]+)(-)([a-zA-Z0-9]+)', token)
+    # matches will contain ['alphanumericString', '-' 'alphanumericString']
+    #if len(matches) == 3:
+    #    newWord = matches[0] + matches[1]
+    #    return(newWord)
+    #else:
+    #    return(token)
+
+def periodRemoval(token):
+    word = token.replace(".", "")
+
+    if len(word) == 0:
+        return(word, False)
+    else:
+        return(word, True)
 
 def isDocMapInDocList(docName, docList):
     for doc in docList:
@@ -15,8 +44,10 @@ def isDocMapInDocList(docName, docList):
     return False
 
 def buildIndex(stopword, stem, norm):
+    stopwords = set(nltk.corpus.stopwords.words("english"))
+    stemmer = nltk.stem.porter.PorterStemmer()
     # Necessary for word_tokenize()
-    nltk.download('punkt')
+    nltk.download('punkt') #TODO: should move to application setup
 
     # tokenize the course collection
     currDir = getcwd()
@@ -38,7 +69,29 @@ def buildIndex(stopword, stem, norm):
                     # inverIndex = termList + tokenizer.tokenize(desc)
                     tokens = nltk.word_tokenize(desc)
                     for token in tokens:
+                    
+                        if stopword and token in stopwords:
+                            continue
+                        if norm:
+                            # TODO
+                            #newToken = langProcess.hyphenRemoval(token)
+                            #newToken, okPeriod = langProcess.periodRemoval(token)
+                            #RMME
+                            newToken, okHyphen = hyphenRemoval(token)
+                            if not okHyphen:
+                                continue
+                            else:
+                                token = newToken
 
+                            newToken, okPeriod = periodRemoval(token)
+                            if not okPeriod:
+                                continue
+                            else:
+                                token = newToken
+
+                        if stem:
+                            token = stemmer.stem(token)
+                            
                         if len(token) == 1:
                             if token in string.punctuation:
                                 continue
@@ -69,7 +122,7 @@ def buildIndex(stopword, stem, norm):
     with open('index.json', 'w') as f:
         json.dump(inverIndex, f, indent=2, sort_keys=True)
 
-buildIndex(False, False, False)
+buildIndex(True, True, True)
 
 
 
