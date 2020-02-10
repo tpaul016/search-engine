@@ -7,7 +7,7 @@ from .cor_pre_proc import pre_processing
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
-    if not (os.environ['FLASK_ENV'] == 'development'):
+    if not (os.environ.get('FLASK_ENV') == 'development'):
         nltk.download('punkt') # Required for word tokenize 
         nltk.download('stopwords') # Required for stopword set 
 
