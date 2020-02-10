@@ -1,9 +1,38 @@
 from flask import Flask, render_template, jsonify, request
-app = Flask(__name__)
+import nltk
+import os
+from .index_and_dict import indexAccess
+from .index_and_dict import indexAndDictBuilder
+from .cor_pre_proc import pre_processing
+
+def create_app(test_config=None):
+    # Perform corpus and index build for the first time
+    if not (os.environ.get('FLASK_ENV') == 'development'):
+        nltk.download('punkt') # Required for word tokenize 
+        nltk.download('stopwords') # Required for stopword set 
+
+        print("Creating app")
+        # All these chdirs are required so files can be run as scripts or modules
+        currDir = os.getcwd()
+        os.chdir("searchapp/cor_pre_proc/")
+        pre_processing.createCorpus()
+        os.chdir(currDir)
+
+        os.chdir("searchapp/cor_pre_proc/corpus")
+        inverIndex = indexAndDictBuilder.buildIndex(True, True, True)
+        os.chdir(currDir)
+
+        os.chdir("searchapp/index_and_dict/")
+        indexAndDictBuilder.serializeIndex(inverIndex)
+        os.chdir(currDir)
+
+    app = Flask(__name__)
+    return app
+
+app = create_app()
 
 if app.config['DEBUG'] == True:
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-
 
 @app.route('/')
 def index():
@@ -37,6 +66,9 @@ def getDocument(docId):
 
 @app.route('/docs', methods=['POST'])
 def handleQuery():
+    #index = indexAccess.getInvertedIndex()
+    #breakpoint()
+
     print(request.form)
     query = request.form["query"]
     model = request.form["model"]
