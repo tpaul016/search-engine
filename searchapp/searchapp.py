@@ -6,6 +6,8 @@ from .index_and_dict import indexAndDictBuilder
 from .cor_pre_proc import pre_processing
 from .cor_access import corpusAccess
 from .spelling_correction import spelling_correction
+from .boolean_retrieval_model import query_pre_processing
+from .boolean_retrieval_model import query_retrieval
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
@@ -13,7 +15,7 @@ def create_app(test_config=None):
         nltk.download('punkt') # Required for word tokenize 
         nltk.download('stopwords') # Required for stopword set 
 
-        print("Creating app")
+        print("Creating app ...")
         pre_processing.createCorpus("searchapp/cor_pre_proc/")
 
         # README: Change booleans here to toggle stopword, stemming and normalization respectively
@@ -48,8 +50,10 @@ def handleQuery():
     collection = request.form["collection"]
 
     # Do stuff here and return a list of dictionaries?
-    if model == "bool":
-        x = 1 + 1 
+    if model == "boolean":
+        formatted_query = query_pre_processing.get_query_documents(query)
+        docs = query_retrieval.execute_query(formatted_query)
+        print(docs)
         # ... pass in the collection to be used
     elif model == "vsm":
         x = 1 + 1
