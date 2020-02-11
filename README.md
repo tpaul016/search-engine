@@ -11,10 +11,6 @@ Stuff that would be nice to have in a wiki
 
 ### Setting up a venv and activating it
 - Reference: https://realpython.com/python-virtual-environments-a-primer/
-- You can see your installed requirements from pip using the command
-```bash
-pip freeze
-```
 
 #### Linux instructions
 Run the following commands
@@ -57,6 +53,12 @@ Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-pow
 Run the following command
 ```
 deactivate
+```
+
+### Viewing installed packages
+- You can see your installed requirements from pip using the command
+```bash
+pip freeze
 ```
 
 ## Running the application
