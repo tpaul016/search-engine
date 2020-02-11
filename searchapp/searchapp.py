@@ -4,6 +4,7 @@ import os
 from .index_and_dict import indexAccess
 from .index_and_dict import indexAndDictBuilder
 from .cor_pre_proc import pre_processing
+from .spelling_correction import spelling_correction
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
@@ -11,7 +12,7 @@ def create_app(test_config=None):
         nltk.download('punkt') # Required for word tokenize 
         nltk.download('stopwords') # Required for stopword set 
 
-        print("Creating app")
+        print("Creating app...")
         # All these chdirs are required so files can be run as scripts or modules
         currDir = os.getcwd()
         os.chdir("searchapp/cor_pre_proc/")
@@ -25,6 +26,8 @@ def create_app(test_config=None):
         os.chdir("searchapp/index_and_dict/")
         indexAndDictBuilder.serializeIndex(inverIndex)
         os.chdir(currDir)
+
+        print("Done creating app")
 
     app = Flask(__name__)
     return app
@@ -95,13 +98,10 @@ def handleQuery():
     ]
     return jsonify(exampleList)
 
-@app.route('/spell', methods=['POST'])
+@app.route('/spell', methods=['GET'])
 def handleSpell():
-    print(request.form)
-    query = request.form["query"]
-
-    # Do stuff here and return a list of corrections?
-
-    # Mocking up with list of corrections
-    exampleList = [query + " This", query + " is", query + " a", query + " test"]
-    return jsonify(exampleList)
+    query = request.args.get('query')
+    suggestions = spelling_correction.check_spelling(query, 10);
+    print('spelling suggestions:')
+    print(suggestions)
+    return jsonify(suggestions)
