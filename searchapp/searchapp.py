@@ -8,6 +8,7 @@ from .cor_access import corpusAccess
 from .spelling_correction import spelling_correction
 from .boolean_retrieval_model import query_pre_processing
 from .boolean_retrieval_model import query_retrieval
+from .vsm import rank
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
@@ -44,10 +45,10 @@ def getDocument(docId):
 @app.route('/docs', methods=['POST'])
 def handleQuery():
 
-    print(request.form)
     query = request.form["query"]
     model = request.form["model"]
     collection = request.form["collection"]
+    docs = []
 
     # Do stuff here and return a list of dictionaries?
     if model == "boolean":
@@ -56,16 +57,15 @@ def handleQuery():
         print(docs)
         # ... pass in the collection to be used
     elif model == "vsm":
-        x = 1 + 1
+        docs = rank.rank(query, collection)
+        print("--------------------------------")
+        print("VSM")
+        print(docs)
+        print("--------------------------------")
         # ... pass in the collection to be used
-
-    # Mocking up with list of dictionaries
-    exampleList = [
-        {"docId": "CSI5168", "excerpt": "Learn to count to 1", "score": 9000},
-        {"docId": "ADM2342", "excerpt": "Learn to count to 2", "score": 2},
-        {"docId": "PSY6133", "excerpt": "Learn to count to 3", "score": 3},
-    ]
-    return jsonify(exampleList)
+    jsonDocs = jsonify(docs)
+    print(jsonDocs)
+    return jsonDocs 
 
 @app.route('/spell', methods=['GET'])
 def handleSpell():

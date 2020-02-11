@@ -23,35 +23,53 @@ def isDocMapInDocList(docName, docList):
             return True
     return False
 
-def buildIndex(path, stopword, stem, norm):
+def normTf(maxTfDict, inverIndex):
+    """ Divide each entry in the index by the max Tf
+    """
+    for token in inverIndex:
+        docs = inverIndex[token]["docs"]
+        for index, doc in enumerate(docs):
+            docId = doc["name"]
+            inverIndex[token]["docs"][index]["tf"] /= maxTfDict[docId]
+    return inverIndex
+
+def preprocToken(token, stopword, stem, norm):
     stopwords = set(nltk.corpus.stopwords.words("english"))
     stemmer = nltk.stem.porter.PorterStemmer()
-    # Necessary for word_tokenize()
 
-    # tokenize the course collection
+    token = langProcess.generalPreProcess(token)
+    if norm:
+        token = langProcess.normalize(token)
+    if stopword and token in stopwords:
+        # Skip stop words
+        return None, False
+        
+    if stem:
+        token = stemmer.stem(token)
+    if token == "":
+        return None, False
+    return token, True
+
+def buildIndex(path, stopword, stem, norm):
+    maxTfDict = {}
+    
+    # Change cwd to the corpus directory
     currDir = getcwd()
     chdir(path)
     inverIndex = {} 
     fileNameList = listdir()
+
+    # tokenize the course collection
     with fileinput.input(fileNameList) as files:
         for f in files:
             soup = BeautifulSoup(f, "xml")
             desc = soup.desc.string
             if desc is not None:
-                # tokenizer = nltk.RegexpTokenizer('\w+|[\w\.]+')
-                # token = tokenizer.tokenize(desc)
                 tokens = nltk.word_tokenize(desc)
+                maxtf = 0
                 for token in tokens:
-                    token = langProcess.generalPreProcess(token)
-                
-                    if norm:
-                        token = langProcess.normalize(token)
-                    if stopword and token in stopwords:
-                        # Skip stop words
-                        continue
-                    if stem:
-                        token = stemmer.stem(token)
-                    if token == "":
+                    token, ok = preprocToken(token, stopword, stem, norm)
+                    if not ok:
                         continue
                         
                     if len(token) == 1:
@@ -60,18 +78,30 @@ def buildIndex(path, stopword, stem, norm):
                             continue
                     elif token not in inverIndex:
                         # If we don't have the token then add it
+                        newTf = 1
                         inverIndex[token] = {"docFreq": 1, \
                                 "docs": [{"name": files.filename(), "tf": 1}]}
                     elif token in inverIndex:
+
                         # Check that we haven't already added this document 
                         # to the tokens doc list
                         if not isDocMapInDocList(files.filename(), inverIndex[token]["docs"]):
+                            newTf = 1
                             inverIndex[token]["docFreq"] += 1
-                            inverIndex[token]["docs"].append({"name": files.filename(), "tf": 1})
+                            inverIndex[token]["docs"].append({"name": files.filename(), "tf": newTf})
+
                         # If document has been added, then we need to adjust the tf
                         else:
                             lengthOfDocList = len(inverIndex[token]["docs"]) - 1
-                            inverIndex[token]["docs"][lengthOfDocList]["tf"] += 1
+                            oldTf = inverIndex[token]["docs"][lengthOfDocList]["tf"] 
+                            newTf = oldTf + 1 
+                            inverIndex[token]["docs"][lengthOfDocList]["tf"] = newTf
+
+                    if maxtf < newTf:
+                        maxtf = newTf
+                maxTfDict[files.filename()] = maxtf
+        #print(maxTfDict)
+        inverIndex = normTf(maxTfDict, inverIndex)
 
     # Sort each postings list
     for token in inverIndex:
