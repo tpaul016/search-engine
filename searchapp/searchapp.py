@@ -12,7 +12,7 @@ def create_app(test_config=None):
         nltk.download('punkt') # Required for word tokenize 
         nltk.download('stopwords') # Required for stopword set 
 
-        print("Creating app")
+        print("Creating app...")
         # All these chdirs are required so files can be run as scripts or modules
         currDir = os.getcwd()
         os.chdir("searchapp/cor_pre_proc/")

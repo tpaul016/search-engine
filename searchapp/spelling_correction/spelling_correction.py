@@ -3,7 +3,7 @@ import numpy as np
 from weighted_levenshtein import lev
 import heapq
 from searchapp.index_and_dict import indexAccess
-import json
+import re
 
 # for testing
 insert_costs = np.ones(128, dtype=np.float64)
@@ -19,6 +19,11 @@ def check_spelling(input, N):
 def construct_heap(index, input):
     h = []
     for value in index:
-        dist = lev(input, value, insert_costs)
+        try:
+            pattern = re.compile('[\W_]*[0-9]*', re.UNICODE) # inspired by https://stackoverflow.com/questions/1276764/stripping-everything-but-alphanumeric-chars-from-a-string-in-python
+            value = pattern.sub('', value)
+            dist = lev(input, value, insert_costs)
+        except:
+            continue
         heapq.heappush(h, (dist, value))
     return h
