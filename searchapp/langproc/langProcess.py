@@ -1,41 +1,30 @@
 import re
 
 def hyphenRemoval(token):
-    word = token.replace("-", "")
+    token = re.sub(r'(-)', '', token)
 
-    # Don't want a word that's only hyphens
-    if len(word) == 0:
-        return(word, False)
-    else:
-        return(word, True)
-
-    # Matches alphanumericString-alphanumericString
-    #matches = re.findall('([a-zA-Z0-9]+)(-)([a-zA-Z0-9]+)', token)
-    # matches will contain ['alphanumericString', '-' 'alphanumericString']
-    #if len(matches) == 3:
-    #    newWord = matches[0] + matches[1]
-    #    return(newWord)
-    #else:
-    #    return(token)
+    # Don't want a token that's only hyphens
+    return(token)
 
 def periodRemoval(token):
-    word = token.replace(".", "")
-    
-    # Don't want a word that's only hyphens
-    if len(word) == 0:
-        return(word, False)
-    else:
-        return(word, True)
+    token = re.sub(r'(\.)', '', token)
+    return(token)
+
+def generalPreProcess(token):
+    # Remove all numbers
+    token = re.sub(r'([0-9]+)', '', token)
+    # Remove all forward slashes
+    token = re.sub(r'(/)', '', token)
+    # Remove unicode characters
+    # Inspired from https://stackoverflow.com/questions/46154561/remove-zero-width-space-unicode-character-from-python-string
+    token = (token.encode('ascii', 'ignore')).decode('utf-8')
+    # Remove appostrophes 
+    token = re.sub(r'(\')', '', token)
+    # Remove plus signs 
+    token = re.sub(r'(\+)', '', token)
+    return token
 
 def normalize(token):
-    newToken, ok = hyphenRemoval(token)
-    if not ok:
-        return newToken, False
-    else:
-        return newToken, True
-
-    newToken, okPeriod = periodRemoval(token)
-    if not ok:
-        return newToken, False
-    else:
-        return newToken, True
+    token = hyphenRemoval(token)
+    token = periodRemoval(token)
+    return token
