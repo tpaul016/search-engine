@@ -5,13 +5,17 @@ import fileinput
 import string
 import logging
 import json
+import re
 from .. langproc import langProcess
-logging.basicConfig(filename='index.log',level=logging.DEBUG)
+logging.basicConfig(filename='index.log', level=logging.DEBUG)
 
-def serializeIndex(inverIndex):
-    # Serialize to JSON 
+def serializeIndex(path, inverIndex):
+    # Serialize to JSON
+    currDir = getcwd()
+    chdir(path)
     with open('index.json', 'w') as f:
         json.dump(inverIndex, f, indent=2, sort_keys=True)
+    chdir(currDir)
 
 def isDocMapInDocList(docName, docList):
     for doc in docList:
@@ -19,13 +23,14 @@ def isDocMapInDocList(docName, docList):
             return True
     return False
 
-def buildIndex(stopword, stem, norm):
+def buildIndex(path, stopword, stem, norm):
     stopwords = set(nltk.corpus.stopwords.words("english"))
     stemmer = nltk.stem.porter.PorterStemmer()
     # Necessary for word_tokenize()
 
     # tokenize the course collection
     currDir = getcwd()
+    chdir(path)
     inverIndex = {} 
     fileNameList = listdir()
     with fileinput.input(fileNameList) as files:
@@ -37,18 +42,17 @@ def buildIndex(stopword, stem, norm):
                 # token = tokenizer.tokenize(desc)
                 tokens = nltk.word_tokenize(desc)
                 for token in tokens:
+                    token = langProcess.generalPreProcess(token)
                 
+                    if norm:
+                        token = langProcess.normalize(token)
                     if stopword and token in stopwords:
                         # Skip stop words
                         continue
-                    if norm:
-                        newToken, ok = langProcess.normalize(token)
-                        if not ok:
-                            continue
-                        else:
-                            token = newToken
                     if stem:
                         token = stemmer.stem(token)
+                    if token == "":
+                        continue
                         
                     if len(token) == 1:
                         # Don't want word that's only puncuation
@@ -74,7 +78,9 @@ def buildIndex(stopword, stem, norm):
         # Inspired from https://stackoverflow.com/questions/72899/how-do-i-sort-a-list-of-dictionaries-by-a-value-of-the-dictionary
         inverIndex[token]["docs"] = sorted(inverIndex[token]["docs"], key=lambda k: k['name'])
 
+    chdir(currDir)
     return inverIndex
+
 
 
 

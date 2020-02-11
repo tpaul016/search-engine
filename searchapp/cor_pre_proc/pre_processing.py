@@ -3,7 +3,10 @@ from xml.etree.ElementTree import Element, ElementTree, SubElement
 from pathlib import Path
 import os
 
-def createCorpus():
+def createCorpus(path):
+    currDir = os.getcwd()
+    os.chdir(path)
+
     with open("./UofO_Courses.html") as fp:
         soup = BeautifulSoup(fp, 'html.parser')
 
@@ -14,7 +17,7 @@ def createCorpus():
         course_title = split_text[0].replace('\n', '')
         split_title = course_title.split(' ')
         # checking if french course
-        if int(split_title[1][1]) > 4 :
+        if int(split_title[1][1]) > 4:
             continue
         course_code = split_title[0].lower() + split_title[1]
         course_desc = split_text[1] if len(split_text) > 1 else None
@@ -28,6 +31,8 @@ def createCorpus():
         tree = ElementTree(course)
         tree.write('./corpus/' + course_code + '.xml')
 
+    os.chdir(currDir)
+
 # If running file as main program
 if __name__ == "__main__":
-    createCorpus()
+    createCorpus(os.getcwd())

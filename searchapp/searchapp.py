@@ -13,20 +13,12 @@ def create_app(test_config=None):
         nltk.download('punkt') # Required for word tokenize 
         nltk.download('stopwords') # Required for stopword set 
 
-        print("Creating app...")
-        # All these chdirs are required so files can be run as scripts or modules
-        currDir = os.getcwd()
-        os.chdir("searchapp/cor_pre_proc/")
-        pre_processing.createCorpus()
-        os.chdir(currDir)
+        print("Creating app")
+        pre_processing.createCorpus("searchapp/cor_pre_proc/")
 
-        os.chdir("searchapp/cor_pre_proc/corpus")
-        inverIndex = indexAndDictBuilder.buildIndex(True, True, True)
-        os.chdir(currDir)
-
-        os.chdir("searchapp/index_and_dict/")
-        indexAndDictBuilder.serializeIndex(inverIndex)
-        os.chdir(currDir)
+        # README: Change booleans here to toggle stopword, stemming and normalization respectively
+        inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
+        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex)
 
         print("Done creating app")
 
@@ -49,8 +41,6 @@ def getDocument(docId):
 
 @app.route('/docs', methods=['POST'])
 def handleQuery():
-    #index = indexAccess.getInvertedIndex()
-    #breakpoint()
 
     print(request.form)
     query = request.form["query"]
