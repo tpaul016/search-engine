@@ -64,43 +64,47 @@ form.addEventListener('submit', querySubmit);
 
 var spellDataList = document.getElementById('spellList');
 
-/* 
-* Handle Spell check
-* EventListener for inputQuery input
-* Posts query then transforms returned data to option elements that are appended 
-* to a datalist that is bound to the input.
-*/
-function spellCheck(ev) {
-    console.log("Spell Check trigger")
-    var fd = new FormData()
-    fd.append('query', ev.target.value)
-    fetch(baseURL + "spell", {
-        method: 'POST',
-        body: fd
-    })
-    .then(response => {
-        console.log("Spell Check response received")
-        return response.json();
-    })
-    .then(data => {
-        // Clear list
-        while (spellDataList.hasChildNodes()) {
-            spellDataList.removeChild(spellDataList.firstChild);
-        }
-
-        data.forEach(correction => {
-            var option = document.createElement("option")
-            option.setAttribute("value", correction)
-            spellDataList.appendChild(option)
-        })
-    })
-    .catch(error => {
-        console.log("Spell Check: Request failed", error)
-    });
-    
-}
-
 // Bind form to spellCheck()
-var inputQuery = document.getElementById('inputQuery');
+let inputQuery = document.getElementById('inputQuery');
 inputQuery.addEventListener('input', spellCheck);
 
+window.addEventListener("load", () => {
+    let input = document.getElementById('inputQuery');
+    input.addEventListener("input", (event) => {
+        spellCheck(event);
+    });
+
+    window.spellCheckRequests = new XMLHttpRequest();
+});
+
+/*
+* Handle Spell check
+* EventListener for inputQuery input
+* Posts query then transforms returned data to option elements that are appended
+* to a datalist that is bound to the input.
+*/
+function spellCheck(event) {
+    let input = event.target;
+    let spellList = document.getElementById('spellList');
+    let min_chars = 1;
+
+    if (input.value.length < min_chars) return;
+    else {
+        window.spellCheckRequests.abort();
+        window.spellCheckRequests.onreadystatechange = () => {
+            if (window.spellCheckRequests.readyState == 4 && window.spellCheckRequests.status == 200) {
+                let response = JSON.parse(window.spellCheckRequests.responseText);
+                spellList.innerHTML = '';
+
+                response.forEach( item => {
+                    let option = document.createElement('option');
+                    option.value = item;
+                    spellList.appendChild(option);
+                })
+            }
+        };
+
+        window.spellCheckRequests.open('GET', '/spell?query=' + input.value, true);
+        window.spellCheckRequests.send();
+    }
+}

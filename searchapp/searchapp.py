@@ -4,6 +4,8 @@ import os
 from .index_and_dict import indexAccess
 from .index_and_dict import indexAndDictBuilder
 from .cor_pre_proc import pre_processing
+from .cor_access import corpusAccess
+from .spelling_correction import spelling_correction
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
@@ -17,6 +19,8 @@ def create_app(test_config=None):
         # README: Change booleans here to toggle stopword, stemming and normalization respectively
         inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
         indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex)
+
+        print("Done creating app")
 
     app = Flask(__name__)
     return app
@@ -32,29 +36,8 @@ def index():
 
 @app.route('/docs/<docId>')
 def getDocument(docId):
-    print(docId)
-
-    # Access Corpus and return a dictionary?
-
-    # Mocking up with a nested dictionary 
-    
-    CSI9000 = {
-        "docId": "CSI9000", 
-        "title": "How do computers work", 
-        "descr": "Blip bop boop I am a computer"
-    }
-    ADM123 = {
-        "docId": "ADM123", 
-        "title": "Crash course to Business", 
-        "descr": "I have no idea, I've never taken a business course"
-    }
-    exampleCorpus = {}
-    exampleCorpus["CSI9000"] = CSI9000
-    exampleCorpus["ADM123"] = ADM123
-
-    exampleDoc = exampleCorpus[docId]
-    
-    return render_template('document.html', docId=docId, title=exampleDoc["title"], descr=exampleDoc["descr"])
+    document = corpusAccess.getDoc(docId)
+    return render_template('document.html', docId=document["docId"], title=document["title"], descr=document["descr"])
 
 @app.route('/docs', methods=['POST'])
 def handleQuery():
@@ -74,24 +57,16 @@ def handleQuery():
 
     # Mocking up with list of dictionaries
     exampleList = [
-        {"docId": "CSI9000", "excerpt": "I am a link that works", "score": 9000},
-        {"docId": "ADM123", "excerpt": "Learn to count to 2", "score": 2},
-        {"docId": "CEG123", "excerpt": "Learn to count to 3", "score": 3},
-        {"docId": "CHM123", "excerpt": "Learn to count to 4", "score": 4},
-        {"docId": "MAT123", "excerpt": "Learn to count to 5", "score": 5},
-        {"docId": "PHY123", "excerpt": "Learn to count to 6", "score": 6},
-        {"docId": "MCG123", "excerpt": "Learn to count to 7", "score": 7},
-        {"docId": "ELG123", "excerpt": "Learn to count to 8", "score": 8}
+        {"docId": "CSI5168", "excerpt": "Learn to count to 1", "score": 9000},
+        {"docId": "ADM2342", "excerpt": "Learn to count to 2", "score": 2},
+        {"docId": "PSY6133", "excerpt": "Learn to count to 3", "score": 3},
     ]
     return jsonify(exampleList)
 
-@app.route('/spell', methods=['POST'])
+@app.route('/spell', methods=['GET'])
 def handleSpell():
-    print(request.form)
-    query = request.form["query"]
-
-    # Do stuff here and return a list of corrections?
-
-    # Mocking up with list of corrections
-    exampleList = [query + " This", query + " is", query + " a", query + " test"]
-    return jsonify(exampleList)
+    query = request.args.get('query')
+    suggestions = spelling_correction.check_spelling(query, 10);
+    print('spelling suggestions:')
+    print(suggestions)
+    return jsonify(suggestions)
