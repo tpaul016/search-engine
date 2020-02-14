@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request
 import nltk
 import os
 from .index_and_dict import indexAccess
-from .index_and_dict import indexAndDictBuilder
+from .index_and_dict import indexAndDictBuilder, biIndex
 from .cor_pre_proc import pre_processing
 from .cor_access import corpusAccess
 from .spelling_correction import spelling_correction
@@ -21,7 +21,9 @@ def create_app(test_config=None):
 
         # README: Change booleans here to toggle stopword, stemming and normalization respectively
         inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
-        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex)
+        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex, "index.json")
+        biInd = biIndex.buildBiIndex(inverIndex)
+        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", biInd, "biIndex.json")
 
         print("Done creating app")
 

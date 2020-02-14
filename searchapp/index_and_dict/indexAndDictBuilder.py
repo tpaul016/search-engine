@@ -9,11 +9,11 @@ import re
 from .. langproc import langProcess
 logging.basicConfig(filename='index.log', level=logging.DEBUG)
 
-def serializeIndex(path, inverIndex):
+def serializeIndex(path, inverIndex, fileName):
     # Serialize to JSON
     currDir = getcwd()
     chdir(path)
-    with open('index.json', 'w') as f:
+    with open(fileName, 'w') as f:
         json.dump(inverIndex, f, indent=2, sort_keys=True)
     chdir(currDir)
 
