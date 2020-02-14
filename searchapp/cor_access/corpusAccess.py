@@ -28,6 +28,11 @@ def getDoc(docId):
 
     return document
 
+def getDocExcerpt(docId):
+    doc = getDoc(docId)
+    excerpt = doc["descr"].partition(".")
+    return excerpt
+
 def getDocList(docIdList):
     documentList = [] 
     for docId in docIdList:
