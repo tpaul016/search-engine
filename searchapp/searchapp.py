@@ -60,11 +60,9 @@ def handleQuery():
         docs = rank.rank(query, collection)
         print("--------------------------------")
         print("VSM")
-        print(docs)
         print("--------------------------------")
         # ... pass in the collection to be used
     jsonDocs = jsonify(docs)
-    print(jsonDocs)
     return jsonDocs 
 
 @app.route('/spell', methods=['GET'])

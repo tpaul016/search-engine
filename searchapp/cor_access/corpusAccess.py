@@ -30,8 +30,8 @@ def getDoc(docId):
 
 def getDocExcerpt(docId):
     doc = getDoc(docId)
-    excerpt = doc["descr"].partition(".")
-    return excerpt
+    excerpt = doc["descr"].partition(".")[0]
+    return excerpt + "."
 
 def getDocList(docIdList):
     documentList = [] 
