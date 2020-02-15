@@ -1,13 +1,79 @@
 # search-engine
 
+# Instructions for the Grader
 Assumptions prior to install
 - Git is installed and accessible from the path or Git Bash (Windows)
 - Python 3 is installed and accessible from the path
 
-# Documentation
-Stuff that would be nice to have in a wiki
+## Installation 
+#### Windows instructions
+Run the following commands
+```
+py -3 -m venv venv
+venv\Scripts\activate
+pip3 install -r requirements.txt
+```
+
+If you encounter the following error or something similar:
+```
+venv\Scripts\activate : File C:\Users\Raymo\Desktop\blah\search-engine\venv\Scripts\Activate.ps1 cannot be
+loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies
+at https:/go.microsoft.com/fwlink/?LinkID=135170.
+At line:1 char:1
++ venv\Scripts\activate
++ ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+```
+1. Open PowerShell in Administrator mode
+2. Input this in the prompt
+```
+set-executionpolicy remotesigned
+```
+3. Say yes
+
+Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-powershell-scripts
+
+## Running the application
+Reference - https://flask.palletsprojects.com/en/1.1.x/quickstart/
+
+- Be in the root directory of the repository when you run these commands
+- The contents of the folder you are in should be:
+```
+env.sh  index.log  Makefile  README.md  requirements.txt  searchapp/  tests/  venv/
+```
+- You may use either PowerShell or CMD
+
+##### Powershell Instructions
+Run the following commands
+```
+$env:FLASK_APP = "searchapp/searchapp.py"
+flask run
+```
+##### OR
+##### CMD Instructions
+Run the following commands
+```
+set FLASK_APP=searchapp/searchapp.py
+flask run
+```
+
+## Rebuilding the Index with Stopword, Stemming and Normalization toggled
+- The file searchapp/searchapp.py contains the code snippet (Line 23):
+```{python}
+# README: Change booleans here to toggle stopword, stemming and normalization respectively
+inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
+```
+- Modify the Boolean parameters to toggle: Stopword, Stemming and Normalization respectively as stated in the code snippet
+
+# End of Instructions for the Grader
+
+# Developer Instructions
 
 ## Installation 
+Assumptions prior to install
+- Git is installed and accessible from the path or Git Bash (Windows)
+- Python 3 is installed and accessible from the path
 
 ### Setting up a venv and activating it
 - Reference: https://realpython.com/python-virtual-environments-a-primer/
