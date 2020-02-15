@@ -67,7 +67,7 @@ Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-pow
 
 ## Running the application
 
-- Be in the root directory of the repository when you run these commands
+- **Be in the root directory of the repository when you run these commands**
 - The contents of the folder you are in should be:
 ```
 env.sh  index.log  Makefile  README.md  requirements.txt  searchapp/  tests/  venv/
