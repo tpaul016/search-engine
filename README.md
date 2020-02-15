@@ -164,6 +164,7 @@ Reference - https://flask.palletsprojects.com/en/1.1.x/quickstart/
 
 - Be in the root directory of the repository when you run these commands
 - Note the setting of the FLASK_ENV variable enables debug mode
+    - **The indexes and corpus will NOT be rebuilt when development mode is set**
 
 #### Linux instructions
 Run the following commands
