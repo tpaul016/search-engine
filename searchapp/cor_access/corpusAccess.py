@@ -11,14 +11,12 @@ def parseDocId(docId):
     return lowerDepartment + match.group(2)
 
 def getDoc(docId):
-    currDir = os.getcwd()
-    os.chdir("searchapp/cor_pre_proc/corpus/")
     newDocId = parseDocId(docId)
     fileName = newDocId + ".xml"
-    
-    with open(fileName) as f:
+    path_to_corpus = os.path.join(os.getcwd(), 'searchapp', 'cor_pre_proc', 'corpus', fileName)
+
+    with open(path_to_corpus) as f:
         soup = BeautifulSoup(f, "xml")
-    os.chdir(currDir)
 
     document = {
         "docId": newDocId,
