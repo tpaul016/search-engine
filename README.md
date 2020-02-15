@@ -2,7 +2,6 @@
 
 # Instructions for the Grader
 Assumptions prior to install
-- Git is installed and accessible from the path or Git Bash (Windows)
 - Python 3 is installed and accessible from the path
 
 # Table of Contents
@@ -106,7 +105,6 @@ inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", Tru
 
 ## Installation 
 Assumptions prior to install
-- Git is installed and accessible from the path or Git Bash (Windows)
 - Python 3 is installed and accessible from the path
 
 ### Setting up a venv and activating it
