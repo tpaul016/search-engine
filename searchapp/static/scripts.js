@@ -90,7 +90,7 @@ function spellCheck(event) {
     let min_chars = 1;
     let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm'
 
-    if (input.value.length < min_chars || model=='bool') {
+    if (input.value.length < min_chars) {
         window.spellCheckRequests.abort();
         spellTitle.style.display = "none";
         spellList.innerHTML = '';
@@ -117,10 +117,7 @@ function spellCheck(event) {
                 });
             }
         };
-        if (model == 'vsm') {
-            model = 'vsm';
-            window.spellCheckRequests.open('GET', '/spell?query=' + input.value + '&model=' + model, true);
-            window.spellCheckRequests.send();
-        }
+        window.spellCheckRequests.open('GET', '/spell?query=' + input.value + '&model=' + model, true);
+        window.spellCheckRequests.send();
     }
 }
