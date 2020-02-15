@@ -8,7 +8,6 @@ def buildBiIndex(inverIndex):
     for token in inverIndex:
         bigramList = bigrams(token)
         bigramListLen = len(list(bigramList))
-        breakpoint()
         for index, (firstChar, lastChar) in enumerate(bigramList):
             bigram = firstChar + lastChar
 
