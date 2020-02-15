@@ -5,8 +5,40 @@ Assumptions prior to install
 - Git is installed and accessible from the path or Git Bash (Windows)
 - Python 3 is installed and accessible from the path
 
+# Table of Contents
+- Installation
+    - Dependencies
+    - Automated installation of external dependencies with pip and virtualenv (Optional)
+- Running the application
+    - Powershell Instructions
+    - CMD Instructions
+- Rebuilding the Index with Stopword, Stemming and Normalization toggled
+
 ## Installation 
-#### Windows instructions
+#### Dependencies
+- The following list is the list of external dependencies that you may manually install. Alternatively you may follow the instructions **Installing external dependencies with pip and requirements.txt** for an automated installation. 
+```
+beautifulsoup4==4.8.2
+Click==7.0
+Flask==1.1.1
+itsdangerous==1.1.0
+Jinja2==2.10.3
+lxml==4.4.2
+MarkupSafe==1.1.1
+nltk==3.4.5
+numpy==1.18.1
+pandas==1.0.1
+pip-autoremove==0.9.1
+python-dateutil==2.8.1
+pytz==2019.3
+six==1.14.0
+soupsieve==1.9.5
+weighted-levenshtein==0.2.1
+Werkzeug==0.16.0
+```
+
+#### Installing external dependencies with pip and requirements.txt 
+
 Run the following commands
 ```
 py -3 -m venv venv
