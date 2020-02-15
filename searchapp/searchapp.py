@@ -72,7 +72,8 @@ def handleQuery():
 @app.route('/spell', methods=['GET'])
 def handleSpell():
     query = request.args.get('query')
-    suggestions = spelling_correction.check_spelling(query, 10);
+    model = request.args.get('model')
+    suggestions = spelling_correction.check_spelling(query, 10, model);
     print('spelling suggestions:')
     print(suggestions)
     return jsonify(suggestions)

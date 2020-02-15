@@ -67,6 +67,7 @@ var spellDataList = document.getElementById('spellList');
 // Bind form to spellCheck()
 let inputQuery = document.getElementById('inputQuery');
 inputQuery.addEventListener('input', spellCheck);
+let spellTitle = document.getElementById('spellTitle');
 
 window.addEventListener("load", () => {
     let input = document.getElementById('inputQuery');
@@ -87,24 +88,39 @@ function spellCheck(event) {
     let input = event.target;
     let spellList = document.getElementById('spellList');
     let min_chars = 1;
+    let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm'
 
-    if (input.value.length < min_chars) return;
+    if (input.value.length < min_chars || model=='bool') {
+        window.spellCheckRequests.abort();
+        spellTitle.style.display = "none";
+        spellList.innerHTML = '';
+    }
     else {
+        spellTitle.style.display = "block";
         window.spellCheckRequests.abort();
         window.spellCheckRequests.onreadystatechange = () => {
             if (window.spellCheckRequests.readyState == 4 && window.spellCheckRequests.status == 200) {
                 let response = JSON.parse(window.spellCheckRequests.responseText);
                 spellList.innerHTML = '';
 
+                if (response.length == 0) spellTitle.style.display = "none";
+
                 response.forEach( item => {
-                    let option = document.createElement('option');
-                    option.value = item;
+                    console.log(item);
+                    let option = document.createElement('li');
+                    let text = document.createTextNode(item);
+                    option.appendChild(text);
+                    option.addEventListener("click", () => {
+                        inputQuery.value = option.innerHTML;
+                    });
                     spellList.appendChild(option);
-                })
+                });
             }
         };
-
-        window.spellCheckRequests.open('GET', '/spell?query=' + input.value, true);
-        window.spellCheckRequests.send();
+        if (model == 'vsm') {
+            model = 'vsm';
+            window.spellCheckRequests.open('GET', '/spell?query=' + input.value + '&model=' + model, true);
+            window.spellCheckRequests.send();
+        }
     }
 }
