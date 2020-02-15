@@ -2,7 +2,7 @@
 
 # Instructions for the Grader
 Assumptions prior to install
-- Python 3 is installed and accessible from the path
+- Python 3 and Pip3 is installed and accessible from the command line
 
 # Table of Contents
 - Installation
