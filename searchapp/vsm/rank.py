@@ -32,7 +32,6 @@ def buildDF(queryList, inverIndex):
     return df
 
 def preProcQuery(query, inverIndex):
-    #TODO: Check that its ok to drop words not in index
     """Convert query to list of strings and DROPS words not in Index
 
     Args:

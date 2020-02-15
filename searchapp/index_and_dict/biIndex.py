@@ -4,7 +4,7 @@ from .. index_and_dict import indexAccess
 
 def buildBiIndex(inverIndex):    
     biIndex = {}
-    print("Building Bigram Index")
+    print("Building Bigram Index ...")
     for token in inverIndex:
         bigramList = list(bigrams(token))
         bigramListLen = len(list(bigramList))
