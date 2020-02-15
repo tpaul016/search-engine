@@ -51,6 +51,7 @@ def preprocToken(token, stopword, stem, norm):
     return token, True
 
 def buildIndex(path, stopword, stem, norm):
+    print("Building Inverted Index")
     maxTfDict = {}
     
     # Change cwd to the corpus directory
@@ -109,6 +110,7 @@ def buildIndex(path, stopword, stem, norm):
         inverIndex[token]["docs"] = sorted(inverIndex[token]["docs"], key=lambda k: k['name'])
 
     chdir(currDir)
+    print("Finished building Inverted Index")
     return inverIndex
 
 
