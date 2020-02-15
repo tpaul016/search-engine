@@ -4,9 +4,9 @@ from .. index_and_dict import indexAccess
 
 def buildBiIndex(inverIndex):    
     biIndex = {}
-
+    print("Building Bigram Index")
     for token in inverIndex:
-        bigramList = bigrams(token)
+        bigramList = list(bigrams(token))
         bigramListLen = len(list(bigramList))
         for index, (firstChar, lastChar) in enumerate(bigramList):
             bigram = firstChar + lastChar
@@ -32,4 +32,5 @@ def buildBiIndex(inverIndex):
             else:
                 biIndex[bigram] = [token]
 
+    print("Finished building Bigram Index")
     return biIndex
