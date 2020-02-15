@@ -56,7 +56,9 @@ def handleQuery():
     if model == "boolean":
         formatted_query = query_pre_processing.get_query_documents(query)
         docs = query_retrieval.execute_query(formatted_query)
-        print(docs)
+        print("--------------------------------")
+        print("Boolean")
+        print("--------------------------------")
         # ... pass in the collection to be used
     elif model == "vsm":
         docs = rank.rank(query, collection)
