@@ -51,7 +51,7 @@ def preprocToken(token, stopword, stem, norm):
     return token, True
 
 def buildIndex(path, stopword, stem, norm):
-    print("Building Inverted Index")
+    print("Building Inverted Index ...")
     maxTfDict = {}
     
     # Change cwd to the corpus directory
@@ -72,12 +72,16 @@ def buildIndex(path, stopword, stem, norm):
                     token, ok = preprocToken(token, stopword, stem, norm)
                     if not ok:
                         continue
-                        
-                    if len(token) == 1:
-                        # Don't want word that's only puncuation
-                        if token in string.punctuation:
-                            continue
-                    elif token not in inverIndex:
+                    
+                    # Don't want word that's only puncuation
+                    allPunc = True
+                    for char in token:
+                        if char not in string.punctuation:
+                            allPunc = False
+                    if allPunc:
+                        continue
+
+                    if token not in inverIndex:
                         # If we don't have the token then add it
                         newTf = 1
                         inverIndex[token] = {"docFreq": 1, \
