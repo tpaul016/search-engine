@@ -15,7 +15,7 @@ Assumptions prior to install
 
 ## Installation 
 - **Throughout the instructions your current working directory must be the root of the repository**
-- You may use either PowerShell or CMD. An example of what your current working directory should look like is below:
+- An example of what your current working directory should look like is below:
 ```
 PS C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.1> dir
 
@@ -89,13 +89,6 @@ Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-pow
 Run the following commands
 ```
 $env:FLASK_APP = "searchapp/searchapp.py"
-flask run
-```
-##### OR
-##### CMD Instructions
-Run the following commands
-```
-set FLASK_APP=searchapp/searchapp.py
 flask run
 ```
 Reference - https://flask.palletsprojects.com/en/1.1.x/quickstart/
