@@ -17,10 +17,10 @@ Assumptions prior to install
 - **Throughout the instructions your current working directory must be the root of the repository**
 - You may use either PowerShell or CMD. An example of what your current working directory should look like is below:
 ```
-PS C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.0> dir
+PS C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.1> dir
 
 
-    Directory: C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.0
+    Directory: C:\Users\rchan086\Desktop\search-engine-1.1\search-engine-1.1
 
 
 Mode                LastWriteTime         Length Name
