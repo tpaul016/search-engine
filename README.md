@@ -14,8 +14,26 @@ Assumptions prior to install
 - Rebuilding the Index with Stopword, Stemming and Normalization toggled
 
 ## Installation 
+- **Throughout the instructions your current working directory must be the root of the repository**
+- You may use either PowerShell or CMD. An example of what your current working directory should look like is below:
+```
+PS C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.0> dir
+
+
+    Directory: C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.0
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       2020-02-16  12:11 AM                searchapp
+-a----       2020-02-16  12:11 AM            171 .gitignore
+-a----       2020-02-16  12:11 AM             69 env.sh
+-a----       2020-02-16  12:11 AM            186 Makefile
+-a----       2020-02-16  12:11 AM           5759 README.md
+-a----       2020-02-16  12:11 AM            283 requirements.txt
+```
 #### Dependencies
-- The following list is the list of external dependencies that you may manually install. Alternatively you may follow the instructions **Installing external dependencies with pip and requirements.txt** for an automated installation. 
+- The following list is the list of external dependencies that you may manually install. ***Alternatively*** you may follow the instructions **Installing external dependencies with pip and requirements.txt** for an automated installation. 
 ```
 beautifulsoup4==4.8.2
 Click==7.0
@@ -66,13 +84,6 @@ set-executionpolicy remotesigned
 Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-powershell-scripts
 
 ## Running the application
-
-- **Be in the root directory of the repository when you run these commands**
-- The contents of the folder you are in should be:
-```
-env.sh  index.log  Makefile  README.md  requirements.txt  searchapp/  tests/  venv/
-```
-- You may use either PowerShell or CMD
 
 ##### Powershell Instructions
 Run the following commands
