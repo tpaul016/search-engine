@@ -61,7 +61,6 @@ Error: Command '['C:\\Users\\rchan086\\Desktop\\search-engine-1.0\\search-engine
 ```
 
 Run the following commands in Command Prompt
-- You may encounter an error about running scripts being disabled on the system. 
 ```
 py -3 -m venv venv
 venv\Scripts\activate
