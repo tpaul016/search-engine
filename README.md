@@ -9,7 +9,6 @@ Assumptions prior to install
     - Dependencies
     - Automated installation of external dependencies with pip and virtualenv (Optional)
 - Running the application
-    - Powershell Instructions
     - CMD Instructions
 - Rebuilding the Index with Stopword, Stemming and Normalization toggled
 
@@ -17,20 +16,20 @@ Assumptions prior to install
 - **Throughout the instructions your current working directory must be the root of the repository**
 - An example of what your current working directory should look like is below:
 ```
-PS C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.1> dir
+C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.0>dir
 
+ Directory of C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.0
 
-    Directory: C:\Users\rchan086\Desktop\search-engine-1.1\search-engine-1.1
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----       2020-02-16  12:11 AM                searchapp
--a----       2020-02-16  12:11 AM            171 .gitignore
--a----       2020-02-16  12:11 AM             69 env.sh
--a----       2020-02-16  12:11 AM            186 Makefile
--a----       2020-02-16  12:11 AM           5759 README.md
--a----       2020-02-16  12:11 AM            283 requirements.txt
+2020-02-16  01:00 AM    <DIR>          .
+2020-02-16  01:00 AM    <DIR>          ..
+2020-02-16  12:29 AM               171 .gitignore
+2020-02-16  12:29 AM                69 env.sh
+2020-02-16  12:29 AM               186 Makefile
+2020-02-16  12:29 AM             5,759 README.md
+2020-02-16  12:37 AM               283 requirements.txt
+2020-02-16  12:29 AM    <DIR>          searchapp
+               5 File(s)          6,468 bytes
+               3 Dir(s)  119,819,497,472 bytes free
 ```
 #### Dependencies
 - The following list is the list of external dependencies that you may manually install. ***Alternatively*** you may follow the instructions **Installing external dependencies with pip and requirements.txt** for an automated installation. 
@@ -54,41 +53,27 @@ weighted-levenshtein==0.2.1
 Werkzeug==0.16.0
 ```
 
-#### Installing external dependencies with pip and requirements.txt 
+#### Automated installation of external dependencies with pip and virtualenv
+- **Having the Anaconda distribution installed may interfere with this process. Uninstalling Anaconda may fix this issue.** The exact error message I encounted is below:
+```
+PS C:\Users\rchan086\Desktop\search-engine-1.0\search-engine-1.0> py -3 -m venv env
+Error: Command '['C:\\Users\\rchan086\\Desktop\\search-engine-1.0\\search-engine-1.0\\env\\Scripts\\python.exe', '-Im', 'ensurepip', '--upgrade', '--default-pip']' returned non-zero exit status 3221225595.
+```
 
-Run the following commands
+Run the following commands in Command Prompt
+- You may encounter an error about running scripts being disabled on the system. 
 ```
 py -3 -m venv venv
 venv\Scripts\activate
 pip3 install -r requirements.txt
 ```
 
-If you encounter the following error or something similar:
-```
-venv\Scripts\activate : File C:\Users\Raymo\Desktop\blah\search-engine\venv\Scripts\Activate.ps1 cannot be
-loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies
-at https:/go.microsoft.com/fwlink/?LinkID=135170.
-At line:1 char:1
-+ venv\Scripts\activate
-+ ~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
-    + FullyQualifiedErrorId : UnauthorizedAccess
-```
-1. Open PowerShell in Administrator mode
-2. Input this in the prompt
-```
-set-executionpolicy remotesigned
-```
-3. Say yes
-
-Reference: https://superuser.com/questions/106360/how-to-enable-execution-of-powershell-scripts
-
 ## Running the application
 
-##### Powershell Instructions
+##### CMD Instructions
 Run the following commands
 ```
-$env:FLASK_APP = "searchapp/searchapp.py"
+set FLASK_APP=searchapp/searchapp.py
 flask run
 ```
 Reference - https://flask.palletsprojects.com/en/1.1.x/quickstart/
