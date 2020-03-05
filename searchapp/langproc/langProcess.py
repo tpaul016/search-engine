@@ -1,10 +1,14 @@
-import re, string
+import re, string, nltk
 
 def hyphenRemoval(token):
     token = re.sub(r'(-)', '', token)
 
     # Don't want a token that's only hyphens
     return(token)
+
+def stem(token):
+    stemmer = nltk.stem.porter.PorterStemmer()
+    return stemmer.stem(token)
 
 def periodRemoval(token):
     token = re.sub(r'(\.)', '', token)

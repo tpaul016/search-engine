@@ -14,8 +14,8 @@ from .relevance_feedback import relevance_index_access
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
     if not (os.environ.get('FLASK_ENV') == 'development'):
-        nltk.download('punkt') # Required for word tokenize 
-        nltk.download('stopwords') # Required for stopword set 
+        nltk.download('punkt')  # Required for word tokenize
+        nltk.download('stopwords')  # Required for stopword set
 
         print("Creating app ...")
         pre_processing.createCourseCorpus("searchapp/cor_pre_proc/")
@@ -43,14 +43,17 @@ app = create_app()
 if app.config['DEBUG'] == True:
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/docs/<docId>')
 def getDocument(docId):
     document = corpusAccess.getDoc(docId)
     return render_template('document.html', docId=document["docId"], title=document["title"], descr=document["descr"])
+
 
 @app.route('/docs', methods=['POST'])
 def handleQuery():
@@ -60,22 +63,20 @@ def handleQuery():
     collection = request.form["collection"]
     docs = []
 
-    # Do stuff here and return a list of dictionaries?
     if model == "boolean":
         formatted_query = query_pre_processing.get_query_documents(query)
         docs = query_retrieval.execute_query(formatted_query)
         print("--------------------------------")
         print("Boolean")
         print("--------------------------------")
-        # ... pass in the collection to be used
     elif model == "vsm":
         docs = rank.rank(query, collection)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
-        # ... pass in the collection to be used
     jsonDocs = jsonify(docs)
     return jsonDocs
+
 
 @app.route('/spell', methods=['GET'])
 def handleSpell():
@@ -85,6 +86,7 @@ def handleSpell():
     print('spelling suggestions:')
     print(suggestions)
     return jsonify(suggestions)
+
 
 @app.route('/relevance', methods=['PUT'])
 def handleRelevance():

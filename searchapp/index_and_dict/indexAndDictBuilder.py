@@ -36,7 +36,6 @@ def normTf(maxTfDict, inverIndex):
 
 def preprocToken(token, stopword, stem, norm):
     stopwords = set(nltk.corpus.stopwords.words("english"))
-    stemmer = nltk.stem.porter.PorterStemmer()
 
     token = langProcess.generalPreProcess(token)
     if norm:
@@ -46,7 +45,7 @@ def preprocToken(token, stopword, stem, norm):
         return None, False
         
     if stem:
-        token = stemmer.stem(token)
+        token = langProcess.stem(token)
     if token == "":
         return None, False
 

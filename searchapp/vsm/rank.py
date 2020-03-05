@@ -4,6 +4,7 @@ from pandas import DataFrame
 import math
 from collections import OrderedDict
 from .. cor_access import corpusAccess
+from .. langproc import langProcess
 
 def buildDF(queryList, inverIndex):
     """Create new DataFrame with entries containing tf weights
@@ -43,18 +44,19 @@ def preProcQuery(query, inverIndex):
     queryList = query.split()
     cleanedQueryList = []
     for query in queryList:
+        query = langProcess.stem(query)
         if inverIndex.get(query):
             cleanedQueryList.append(query)
     return cleanedQueryList
 
 def tfidf(tf, N, docFreq):
-    """Calculate tf-idf value 
+    """Calculate tf-idf value
 
     N + 1
 
     Args:
         tf: The NORMALIZED (by max tf) term frequency value of the word in the document
-        N: The amount of documents 
+        N: The amount of documents
         docFreq: The document frequency of the word
     Returns:
         Calculated tf-idf weighting
