@@ -48,6 +48,15 @@ def preprocToken(token, stopword, stem, norm):
         token = stemmer.stem(token)
     if token == "":
         return None, False
+
+    # Don't want word that's only puncuation
+    allPunc = True
+    for char in token:
+        if char not in string.punctuation:
+            allPunc = False
+    if allPunc:
+        return None, False
+
     return token, True
 
 def buildIndex(path, stopword, stem, norm):
@@ -73,13 +82,6 @@ def buildIndex(path, stopword, stem, norm):
                     if not ok:
                         continue
                     
-                    # Don't want word that's only puncuation
-                    allPunc = True
-                    for char in token:
-                        if char not in string.punctuation:
-                            allPunc = False
-                    if allPunc:
-                        continue
 
                     if token not in inverIndex:
                         # If we don't have the token then add it
