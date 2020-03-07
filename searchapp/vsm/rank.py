@@ -47,6 +47,8 @@ def preProcQuery(query, inverIndex):
         query = langProcess.stem(query)
         if inverIndex.get(query):
             cleanedQueryList.append(query)
+        else:
+            print("Dropped:", query)
     return cleanedQueryList
 
 def tfidf(tf, N, docFreq):
