@@ -2,10 +2,9 @@ from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 import nltk
 import os
-from .index_and_dict import indexAccess
 from .index_and_dict import indexAndDictBuilder, biIndex
 from .cor_pre_proc import pre_processing
-from .cor_access import corpusAccess
+from .cor_access import corpusAccess, corpus_enum
 from .spelling_correction import spelling_correction
 from .boolean_retrieval_model import query_pre_processing
 from .boolean_retrieval_model import query_retrieval
@@ -21,11 +20,17 @@ def create_app(test_config=None):
         print("Creating app ...")
         pre_processing.createCourseCorpus("searchapp/cor_pre_proc/")
 
-        # README: Change booleans here to toggle stopword, stemming and normalization respectively
-        inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
-        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex, "courseIndex.json")
-        biInd = biIndex.buildBiIndex(inverIndex)
-        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", biInd, "courseBiIndex.json")
+        # README: Change booleans here to toggle stopword, stemming and normalization respectively for Courses
+        #inverIndex = indexAndDictBuilder.buildIndex(corpus_enum.Corpus.COURSES, True, True, True)
+        #indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex, "courseIndex.json")
+        #biInd = biIndex.buildBiIndex(inverIndex)
+        #indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", biInd, "courseBiIndex.json")
+
+        # README: Change booleans here to toggle stopword, stemming and normalization respectively for Reuters
+        #inverIndex = indexAndDictBuilder.buildIndex(corpus_enum.Corpus.REUTERS, True, True, True)
+        #indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex, "reutersIndex.json")
+        #biInd = biIndex.buildBiIndex(inverIndex)
+        #indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", biInd, "reutersBiIndex.json")
 
         print("Done creating app")
 

@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-from corpus_enum import Corpus
 from bs4 import BeautifulSoup
 
 def parseCoursesDocId(docId):

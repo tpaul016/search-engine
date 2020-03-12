@@ -7,6 +7,7 @@ import logging
 import json
 import re
 from .. langproc import langProcess
+from .. cor_access import corpus_enum
 logging.basicConfig(filename='index.log', level=logging.DEBUG)
 
 def serializeIndex(path, inverIndex, fileName):
@@ -59,21 +60,26 @@ def preprocToken(token, stopword, stem, norm):
 
     return token, True
 
-def buildIndex(path, stopword, stem, norm):
+def buildIndex(corpus, stopword, stem, norm):
     print("Building Inverted Index ...")
     maxTfDict = {}
     
     # Change cwd to the corpus directory
+    path = "searchapp/cor_pre_proc/" + corpus.value
     currDir = getcwd()
     chdir(path)
-    inverIndex = {} 
+    inverIndex = {}
     fileNameList = listdir()
 
-    # tokenize the course collection
-    with fileinput.input(fileNameList) as files:
-        for f in files:
+    for path in fileNameList:
+        with open(path) as f:
             soup = BeautifulSoup(f, "xml")
-            desc = soup.desc.string
+
+            if corpus == corpus_enum.Corpus.COURSES:
+                desc = soup.desc.string
+            elif corpus == corpus_enum.Corpus.REUTERS:
+                desc = soup.body.string
+
             if desc is not None:
                 tokens = nltk.word_tokenize(desc)
                 maxtf = 0
@@ -86,15 +92,15 @@ def buildIndex(path, stopword, stem, norm):
                         # If we don't have the token then add it
                         newTf = 1
                         inverIndex[token] = {"docFreq": 1, \
-                                "docs": [{"name": files.filename(), "tf": 1}]}
+                                "docs": [{"name": path, "tf": 1}]}
                     elif token in inverIndex:
 
                         # Check that we haven't already added this document
                         # to the tokens doc list
-                        if not isDocMapInDocList(files.filename(), inverIndex[token]["docs"]):
+                        if not isDocMapInDocList(path, inverIndex[token]["docs"]):
                             newTf = 1
                             inverIndex[token]["docFreq"] += 1
-                            inverIndex[token]["docs"].append({"name": files.filename(), "tf": newTf})
+                            inverIndex[token]["docs"].append({"name": path, "tf": newTf})
 
                         # If document has been added, then we need to adjust the tf
                         else:
@@ -105,9 +111,9 @@ def buildIndex(path, stopword, stem, norm):
 
                     if maxtf < newTf:
                         maxtf = newTf
-                maxTfDict[files.filename()] = maxtf
-        #print(maxTfDict)
-        inverIndex = normTf(maxTfDict, inverIndex)
+                maxTfDict[path] = maxtf
+    #print(maxTfDict)
+    inverIndex = normTf(maxTfDict, inverIndex)
 
     # Sort each postings list
     for token in inverIndex:
