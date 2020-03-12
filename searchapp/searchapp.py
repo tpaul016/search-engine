@@ -23,9 +23,9 @@ def create_app(test_config=None):
 
         # README: Change booleans here to toggle stopword, stemming and normalization respectively
         inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
-        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex, "index.json")
+        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", inverIndex, "courseIndex.json")
         biInd = biIndex.buildBiIndex(inverIndex)
-        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", biInd, "biIndex.json")
+        indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", biInd, "courseBiIndex.json")
 
         print("Done creating app")
 

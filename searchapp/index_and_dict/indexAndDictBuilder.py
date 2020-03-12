@@ -81,7 +81,6 @@ def buildIndex(path, stopword, stem, norm):
                     token, ok = preprocToken(token, stopword, stem, norm)
                     if not ok:
                         continue
-                    
 
                     if token not in inverIndex:
                         # If we don't have the token then add it
@@ -90,7 +89,7 @@ def buildIndex(path, stopword, stem, norm):
                                 "docs": [{"name": files.filename(), "tf": 1}]}
                     elif token in inverIndex:
 
-                        # Check that we haven't already added this document 
+                        # Check that we haven't already added this document
                         # to the tokens doc list
                         if not isDocMapInDocList(files.filename(), inverIndex[token]["docs"]):
                             newTf = 1
