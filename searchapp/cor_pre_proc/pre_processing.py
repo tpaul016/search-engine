@@ -3,7 +3,10 @@ from xml.etree.ElementTree import Element, ElementTree, SubElement
 from pathlib import Path
 import os
 
-def createCorpus(path):
+# if the reuters corpus will be created
+process_reuters = False
+
+def createCourseCorpus(path):
     currDir = os.getcwd()
     os.chdir(path)
 
@@ -33,6 +36,49 @@ def createCorpus(path):
 
     os.chdir(currDir)
 
+
+def create_reuters_corpus(dir_path):
+    article_id = 0
+    Path('./reuters/processed').mkdir(parents=True, exist_ok=True)
+    file_paths = [os.path.join(dir_path, f) for f in os.listdir(dir_path)]
+
+    for path in file_paths:
+        if not path.endswith(".sgm"):
+            continue
+
+        with open(path) as fp:
+            soup = BeautifulSoup(fp, 'html.parser')
+
+        for tag in soup.find_all('reuters'):
+            # parsing reuters
+            date_text = tag.find('date').text
+            topics_text = ','.join(list(map(lambda x: x.text, tag.find('topics').contents)))
+            try:
+                title_text = tag.find('title').text
+            except:
+                title_text = title.text
+            try:
+                body_text = tag.find('body').text
+            except:
+                body_text = body.text
+
+            # creating xml
+            reuters = Element('reuters')
+            date = SubElement(reuters, 'date')
+            date.text = date_text
+            topics = SubElement(reuters, 'topics')
+            topics.text = topics_text
+            title = SubElement(reuters, 'title')
+            title.text = title_text
+            body = SubElement(reuters, 'body')
+            body.text = body_text
+            tree = ElementTree(reuters)
+            tree.write('./reuters/processed/reuters-' + str(article_id) + '.xml')
+            article_id += 1
+
+if process_reuters:
+    create_reuters_corpus('./reuters/raw')
+
 # If running file as main program
 if __name__ == "__main__":
-    createCorpus(os.getcwd())
+    createCourseCorpus(os.getcwd())
