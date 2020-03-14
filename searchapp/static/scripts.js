@@ -51,7 +51,42 @@ function querySubmit(ev) {
             pScore = document.createElement("p")
             pScore.innerHTML = "Score: " + doc["score"]
             newDiv.appendChild(pScore)
+
+            dRelevant = document.createElement("input");
+            dRelevant.className = "relevantDocs";
+            dRelevant.setAttribute("type", "checkbox");
+            dRelevant.setAttribute("value", doc['docId']);
+            dRelevant.setAttribute("onclick", "handleRelevanceFeedback(this)");
+            newDiv.appendChild(dRelevant);
+
+            newDiv.insertAdjacentHTML('beforeend', "Document is <strong>relevant</strong> to query<br>")
+
+            dNonRelevant = document.createElement("input");
+            dNonRelevant.className = "nonRelevantDocs";
+            dNonRelevant.setAttribute("type", "checkbox");
+            dNonRelevant.setAttribute("value", doc['docId']);
+            dNonRelevant.setAttribute("onclick", "handleRelevanceFeedback(this)");
+            newDiv.appendChild(dNonRelevant);
+
+            newDiv.insertAdjacentHTML('beforeend', "Document is <strong>non-relevant</strong> to query<br>")
         })
+    })
+    .catch(error => {
+        console.log("Query: Request failed", error)
+    });
+}
+
+function handleRelevanceFeedback(event) {
+    let checked = event.checked;
+    let docId = event.value;
+    let type = event.className;
+
+    fetch(baseURL + "relevance?query=" + inputQuery.value + "&docId=" + docId + "&checked=" + checked + "&type=" + type, {
+        method: 'PUT',
+    })
+    .then(response => {
+        console.log("Query response received")
+        return response.json();
     })
     .catch(error => {
         console.log("Query: Request failed", error)

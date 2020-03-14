@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 import nltk
 import os
 from .index_and_dict import indexAccess
@@ -9,6 +10,7 @@ from .spelling_correction import spelling_correction
 from .boolean_retrieval_model import query_pre_processing
 from .boolean_retrieval_model import query_retrieval
 from .vsm import rank
+from .relevance_feedback import relevance_index_access
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
@@ -17,7 +19,7 @@ def create_app(test_config=None):
         nltk.download('stopwords') # Required for stopword set 
 
         print("Creating app ...")
-        pre_processing.createCorpus("searchapp/cor_pre_proc/")
+        pre_processing.createCourseCorpus("searchapp/cor_pre_proc/")
 
         # README: Change booleans here to toggle stopword, stemming and normalization respectively
         inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
@@ -28,6 +30,7 @@ def create_app(test_config=None):
         print("Done creating app")
 
     app = Flask(__name__)
+    CORS(app)
     return app
 
 app = create_app()
@@ -67,13 +70,24 @@ def handleQuery():
         print("--------------------------------")
         # ... pass in the collection to be used
     jsonDocs = jsonify(docs)
-    return jsonDocs 
+    return jsonDocs
 
 @app.route('/spell', methods=['GET'])
 def handleSpell():
     query = request.args.get('query')
     model = request.args.get('model')
-    suggestions = spelling_correction.check_spelling(query, 10, model);
+    suggestions = spelling_correction.check_spelling(query, 10, model)
     print('spelling suggestions:')
     print(suggestions)
     return jsonify(suggestions)
+
+@app.route('/relevance', methods=['PUT'])
+def handleRelevance():
+    query = request.args.get('query')
+    docId = request.args.get('docId')
+    type = request.args.get('type')
+    checked = request.args.get('checked') == "true"
+    print(query)
+
+    relevance_index_access.update(query, docId, type, checked)
+    return jsonify('updated')
