@@ -11,6 +11,11 @@
     <form id="query" autocomplete="off">
         <h1>Query</h1>
             <input id="inputQuery" type="text" name="query" list="spellList" size="35">
+        <h1>Text Completion</h1>
+            <input type="radio" name="completion" value="spellCorrection" checked>Spelling Correction<br>
+            <input type="radio" name="completion" value="globalExpansion">Global Query Expansion<br>
+            <input type="radio" name="completion" value="localExpansion">Local Query Expansion<br>
+
             <h4 id="spellTitle" style="display: none">Spelling Suggestions (click on option to change input):</h4>
             <ul id="spellList"></ul>
         <h1>Model</h1>
@@ -19,7 +24,7 @@
         <h1>Collection</h1>
             <input type="radio" name="collection" value="courses" checked>Courses<br>
             <input type="radio" name="collection" value="reuters">Reuters<br>
-        <input type="submit" value="Submit">
+        <br><input type="submit" value="Submit">
     </form>
 
     <div id="docList"></div>
