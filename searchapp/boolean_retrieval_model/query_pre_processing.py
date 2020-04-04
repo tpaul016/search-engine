@@ -1,6 +1,7 @@
 from searchapp.index_and_dict import indexAccess
 import os
 from searchapp.cor_access import corpusAccess
+from ..cor_access import corpus_enum
 
 # inspired by https://runestone.academy/runestone/books/published/pythonds/BasicDS/InfixPrefixandPostfixExpressions.html
 def query_to_postfix(query):
@@ -69,11 +70,16 @@ def query_to_postfix(query):
 
     return new_query
 
-def get_query_documents(query):
+def get_query_documents(query, corpus):
     query = query_to_postfix(query)
     formatted_query = []
 
-    path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', 'index.json')
+    if corpus is corpus_enum.Corpus.COURSES:
+        file_name = 'courseIndex.json'
+    elif corpus is corpus_enum.Corpus.REUTERS:
+        file_name = 'reutersIndex.json'
+
+    path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', file_name)
     index = indexAccess.getInvertedIndex(path_to_index=path_to_index)
 
     for token in query:

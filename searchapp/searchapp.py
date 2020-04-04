@@ -17,8 +17,8 @@ def create_app(test_config=None):
         nltk.download('punkt')  # Required for word tokenize
         nltk.download('stopwords')  # Required for stopword set
 
-        print("Creating app ...")
-        pre_processing.createCourseCorpus("searchapp/cor_pre_proc/")
+        #print("Creating app ...")
+        #pre_processing.createCourseCorpus("searchapp/cor_pre_proc/")
 
         # README: Change booleans here to toggle stopword, stemming and normalization respectively for Courses
         #inverIndex = indexAndDictBuilder.buildIndex(corpus_enum.Corpus.COURSES, True, True, True)
@@ -32,7 +32,7 @@ def create_app(test_config=None):
         #biInd = biIndex.buildBiIndex(inverIndex)
         #indexAndDictBuilder.serializeIndex("searchapp/index_and_dict/", biInd, "reutersBiIndex.json")
 
-        print("Done creating app")
+        #print("Done creating app")
 
     app = Flask(__name__)
     CORS(app)
@@ -61,10 +61,18 @@ def handleQuery():
     query = request.form["query"]
     model = request.form["model"]
     collection = request.form["collection"]
+    corpus = get_corpus_enum(collection)
     docs = []
 
+    if collection == "courses":
+        corpus = corpus_enum.Corpus.COURSES
+    elif collection == "reuters":
+        corpus = corpus_enum.Corpus.REUTERS
+    else:
+        print("No match for Corpus!!!!!")
+
     if model == "boolean":
-        formatted_query = query_pre_processing.get_query_documents(query)
+        formatted_query = query_pre_processing.get_query_documents(query, corpus)
         docs = query_retrieval.execute_query(formatted_query)
         print("--------------------------------")
         print("Boolean")
@@ -77,12 +85,24 @@ def handleQuery():
     jsonDocs = jsonify(docs)
     return jsonDocs
 
+def get_corpus_enum(corpus_string):
+    if corpus_string == "courses":
+        return corpus_enum.Corpus.COURSES
+    elif corpus_string == "reuters":
+        return corpus_enum.Corpus.REUTERS
+    else:
+        print("No match for Corpus!!!!!")
+        return "No match for Corpus!!!"
+
 
 @app.route('/spell', methods=['GET'])
 def handleSpell():
     query = request.args.get('query')
     model = request.args.get('model')
-    suggestions = spelling_correction.check_spelling(query, 10, model)
+    collection = request.args.get('corpus')
+    corpus = get_corpus_enum(collection)
+
+    suggestions = spelling_correction.check_spelling(query, 10, model, corpus)
     print('spelling suggestions:')
     print(suggestions)
     return jsonify(suggestions)

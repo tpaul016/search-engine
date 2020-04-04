@@ -124,6 +124,7 @@ function spellCheck(event) {
     let spellList = document.getElementById('spellList');
     let min_chars = 1;
     let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm'
+    let corpus = document.getElementById('coursesButton').checked ? 'courses' : 'reuters'
 
     if (input.value.length < min_chars) {
         window.spellCheckRequests.abort();
@@ -152,7 +153,7 @@ function spellCheck(event) {
                 });
             }
         };
-        window.spellCheckRequests.open('GET', '/spell?query=' + input.value + '&model=' + model, true);
+        window.spellCheckRequests.open('GET', '/spell?query=' + input.value + '&model=' + model + '&corpus=' + corpus, true);
         window.spellCheckRequests.send();
     }
 }
