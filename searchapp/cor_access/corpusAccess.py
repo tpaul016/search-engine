@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+from nltk.data import load
 from bs4 import BeautifulSoup
 from .corpus_enum import Corpus
 
@@ -62,13 +63,19 @@ def getDocExcerpt(docId, corpus):
     doc = getDoc(docId, corpus)
 
     if corpus == Corpus.COURSES:
-        excerpt = doc["descr"].partition(".")[0]
+        text = doc["descr"]
     elif corpus == Corpus.REUTERS:
-        excerpt = doc["body"].partition(".")[0]
+        text = doc["body"]
     else:
         # Should never hit this
         sys.exit(-1)
-    return excerpt + "."
+
+    # https://www.nltk.org/api/nltk.tokenize.html
+    # Create sentence classifier
+    sent_detector = load('tokenizers/punkt/english.pickle')
+    excerpt = sent_detector.tokenize(text)[0]
+
+    return excerpt
 
 def getDocList(docIdList, corpus):
     documentList = []
