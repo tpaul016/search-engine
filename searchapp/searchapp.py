@@ -95,7 +95,7 @@ def handleQuery():
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
-    expan_query = glob_query_expan.expand_query(query, model, 3, all_lemmas)
+    expan_query = glob_query_expan.expand_query(query, model, 3, all_lemmas, corpus)
     result = {"docs": docs, "expans": expan_query}
     print("Global Expansion: Expanded Query", expan_query)
     
