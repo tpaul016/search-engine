@@ -91,11 +91,12 @@ def get_query_documents(query, corpus):
                 for doc in index[token]['docs']:
                     doc_entry = {}
                     doc_entry['docId'] = doc['name'].split(".")[0]
-                    doc_entry['excerpt'] = corpusAccess.getDocExcerpt(doc_entry['docId'])
+                    doc_entry['excerpt'] = corpusAccess.getDocExcerpt(doc_entry['docId'], corpus)
                     doc_entry['score'] = 1
                     docs.append(doc_entry)
                 formatted_query.append(docs)
-            except:
+            except Exception as e:
+                print(e)
                 print(token + ' not in the index')
 
     return formatted_query

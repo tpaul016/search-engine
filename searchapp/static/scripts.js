@@ -12,6 +12,8 @@ var divDocList = document.getElementById('docList');
 
 var baseURL = "http://localhost:5000/"
 
+var currentCorpus = ''
+
 /*
 * Handle Query submission
 * EventListener for query form
@@ -20,6 +22,7 @@ var baseURL = "http://localhost:5000/"
 */
 function querySubmit(ev) {
     ev.preventDefault();
+    currentCorpus = document.getElementById('coursesButton').checked ? 'courses/' : 'reuters/'
     fetch(baseURL + "docs", {
         method: 'POST',
         body: new FormData(this)
@@ -40,7 +43,7 @@ function querySubmit(ev) {
             divDocList.appendChild(newDiv)
 
             aDocId = document.createElement("a")
-            aDocId.setAttribute("href", baseURL + "docs/" + doc["docId"])
+            aDocId.setAttribute("href", baseURL + "docs/" + currentCorpus + doc["docId"])
             aDocId.innerHTML = "DocId: " + doc["docId"]
             newDiv.appendChild(aDocId)
 

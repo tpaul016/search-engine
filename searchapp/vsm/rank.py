@@ -3,7 +3,7 @@ import numpy as np
 from pandas import DataFrame
 import math
 from collections import OrderedDict
-from .. cor_access import corpusAccess
+from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
 
 def buildDF(queryList, inverIndex):
@@ -109,7 +109,7 @@ def strListToVec(strList):
 
     return queryVec
 
-def cosSim(queryVec, docVec):
+def cosSim(queryVec, docVec, file_name):
     """Calculate the cosine similarity of two vectors
 
     Args:
@@ -124,7 +124,7 @@ def cosSim(queryVec, docVec):
         (np.sqrt(np.dot(queryVec, queryVec)) * np.sqrt(np.dot(docVec, docVec)))
     return cosSim
 
-def rank(query, collection):
+def rank(query, collection, corpus):
     """Produce rankings for the query
 
     Args:
@@ -134,7 +134,12 @@ def rank(query, collection):
         List of Dicts {docId:, excerpt:, score:}
 
     """
-    inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/index.json')
+    if corpus is corpus_enum.Corpus.COURSES:
+        file_name = 'courseIndex.json'
+    elif corpus is corpus_enum.Corpus.REUTERS:
+        file_name = 'reutersIndex.json'
+
+    inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
     queryList = preProcQuery(query, inverIndex)
     df = buildDF(queryList, inverIndex)
     rows, columns = df.shape
@@ -144,9 +149,9 @@ def rank(query, collection):
     first = True
     for index, row in df.iterrows():
         docVec = row.to_numpy()
-        score = cosSim(queryVec, docVec)
+        score = cosSim(queryVec, docVec, corpus)
         docId = row.name.split(".")[0]
-        excerpt = corpusAccess.getDocExcerpt(docId)
+        excerpt = corpusAccess.getDocExcerpt(docId, corpus)
         newDict = {"docId": docId, "excerpt": excerpt, "score": score} 
         rankedDictList.append(newDict)
 

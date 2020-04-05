@@ -49,10 +49,18 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/docs/<docId>')
-def getDocument(docId):
-    document = corpusAccess.getDoc(docId)
-    return render_template('document.html', docId=document["docId"], title=document["title"], descr=document["descr"])
+@app.route('/docs/<corpus>/<docId>')
+def getDocument(corpus, docId):
+    corpus_e = get_corpus_enum(corpus)
+    document = corpusAccess.getDoc(docId, corpus_e)
+
+    if corpus_e is corpus_enum.Corpus.COURSES:
+        return render_template('document.html', docId=document["docId"], title=document["title"], descr=document["descr"])
+    elif corpus_e is corpus_enum.Corpus.REUTERS:
+        return render_template('document.html', docId=document["docId"], title=document["title"], descr=document["body"])
+    else:
+        return jsonify("Invalid corpus")
+
 
 
 @app.route('/docs', methods=['POST'])
@@ -78,7 +86,7 @@ def handleQuery():
         print("Boolean")
         print("--------------------------------")
     elif model == "vsm":
-        docs = rank.rank(query, collection)
+        docs = rank.rank(query, collection, corpus)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
