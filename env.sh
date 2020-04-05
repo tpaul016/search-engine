@@ -1,2 +1,2 @@
 export FLASK_APP=searchapp/searchapp.py
-export FLASK_ENV=development
+export FLASK_ENV=

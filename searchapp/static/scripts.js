@@ -13,6 +13,7 @@ var divDocList = document.getElementById('docList');
 var baseURL = "http://localhost:5000/"
 
 var currentCorpus = ''
+var expanText = ''
 
 /*
 * Handle Query submission
@@ -32,12 +33,17 @@ function querySubmit(ev) {
         return response.json();
     })
     .then(data => {
+        // Handle the Global Query Expansion div and text
+        expanText = data.expans 
+        document.getElementById("globExpText").innerHTML = expanText
+        document.getElementById("globExpDiv").style.display = "block"
+        
         // Clear list
         while (divDocList.hasChildNodes()) {
             divDocList.removeChild(divDocList.firstChild);
         }
 
-        data.forEach(doc => {
+        data.docs.forEach(doc => {
             newDiv = document.createElement("div")
             newDiv.setAttribute("class", "doc")
             divDocList.appendChild(newDiv)
@@ -95,6 +101,14 @@ function handleRelevanceFeedback(event) {
         console.log("Query: Request failed", error)
     });
 }
+
+// Handle the button for the Global Query Expansion
+function handleReplaceButton(event) {
+    document.getElementById('inputQuery').value = expanText
+}
+
+var replaceButton = document.getElementById('replaceButton');
+replaceButton.addEventListener('click', handleReplaceButton);
 
 // Bind form to querySubmit()
 var form = document.getElementById('query');

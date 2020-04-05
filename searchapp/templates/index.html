@@ -8,9 +8,14 @@
 
 <body>
     <h1>Welcome to RT Search!</h1>
+    <div id= "globExpDiv" style="display: none">
+        <h3>Replace with Global expansion?</h1>
+        <div style="border-style: double" id="globExpText"></div>
+        <button type="button" id="replaceButton">Replace with expansion</button>
+    </div>
     <form id="query" autocomplete="off">
         <h1>Query</h1>
-            <input id="inputQuery" type="text" name="query" list="spellList" size="35">
+            <input id="inputQuery" type="text" name="query" list="spellList" size="100">
             <h4 id="spellTitle" style="display: none">Spelling Suggestions (click on option to change input):</h4>
             <ul id="spellList"></ul>
         <h1>Model</h1>
