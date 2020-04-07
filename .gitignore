@@ -18,3 +18,5 @@ build/
 
 corpus
 *.log
+
+.DS_Store
