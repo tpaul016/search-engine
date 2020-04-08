@@ -102,19 +102,20 @@ form.addEventListener('submit', querySubmit);
 
 var spellDataList = document.getElementById('spellList');
 
+// Disabled spellcheck
 // Bind form to spellCheck()
-let inputQuery = document.getElementById('inputQuery');
-inputQuery.addEventListener('input', spellCheck);
-let spellTitle = document.getElementById('spellTitle');
+// let inputQuery = document.getElementById('inputQuery');
+// inputQuery.addEventListener('input', spellCheck);
+// let spellTitle = document.getElementById('spellTitle');
 
-window.addEventListener("load", () => {
-    let input = document.getElementById('inputQuery');
-    input.addEventListener("input", (event) => {
-        spellCheck(event);
-    });
-
-    window.spellCheckRequests = new XMLHttpRequest();
-});
+// window.addEventListener("load", () => {
+//     let input = document.getElementById('inputQuery');
+//     input.addEventListener("input", (event) => {
+//         spellCheck(event);
+//     });
+//
+//     window.spellCheckRequests = new XMLHttpRequest();
+// });
 
 /*
 * Handle Spell check
@@ -126,8 +127,8 @@ function spellCheck(event) {
     let input = event.target;
     let spellList = document.getElementById('spellList');
     let min_chars = 1;
-    let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm'
-    let corpus = document.getElementById('coursesButton').checked ? 'courses' : 'reuters'
+    let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm';
+    let corpus = document.getElementById('coursesButton').checked ? 'courses' : 'reuters';
 
     if (input.value.length < min_chars) {
         window.spellCheckRequests.abort();
