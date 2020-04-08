@@ -161,3 +161,58 @@ function spellCheck(event) {
         window.spellCheckRequests.send();
     }
 }
+
+// inspired by https://stackoverflow.com/questions/24386354/execute-js-code-after-pressing-the-spacebar
+inputQuery.onkeyup = (e) => {
+    if (e.keyCode == 32 || e.key == ' ') queryCompletion(inputQuery.value);
+}
+
+
+function queryCompletion(input) {
+    input = input.trim();
+    let suggestionList = document.getElementById('querySuggestionList');
+    if (input.length == 0) {
+        suggestionList.innerHTML = '';
+        return;
+    }
+
+    lastInputToken = input.split(' ');
+    lastInputToken = lastInputToken[lastInputToken.length-1];
+
+    let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm';
+    if (model == 'bool' && (lastInputToken == 'AND' || lastInputToken == 'OR' || lastInputToken == 'AND_NOT' || lastInputToken == '(' || lastInputToken == ')')) {
+        suggestionList.innerHTML = '';
+        return;
+    }
+
+    let corpus = document.getElementById('coursesButton').checked ? 'courses' : 'reuters';
+    let completionForm = new FormData();
+    completionForm.append('model', model);
+    completionForm.append('collection', corpus);
+    completionForm.append('query', lastInputToken);
+
+    fetch(baseURL + 'localquerycompletion' , {
+        method: 'POST',
+        body: completionForm
+    })
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            let suggestionsTitle = document.getElementById('suggestionsTitle');
+            suggestionsTitle.style.display = "block";
+            suggestionList.innerHTML = '';
+            data.forEach(suggestion => {
+                let option = document.createElement('li');
+                let text = document.createTextNode(input + ' ' + suggestion);
+                option.appendChild(text);
+                option.addEventListener("click", () => {
+                    inputQuery.value = option.innerHTML;
+                });
+                suggestionList.appendChild(option);
+            })
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+}
