@@ -53,7 +53,13 @@ def build_bigram_language_module(corpus, stopword, stem, norm):
     for token in bigram_language_model:
         bigram_language_model[token]['conditional_words'] = dict(sorted(bigram_language_model[token]['conditional_words'].items(), key=lambda x: x[1], reverse=True))
 
-    with open('./bigram_language_model.json', 'w') as file:
+    if corpus == corpus_enum.Corpus.COURSES:
+        file_name = 'courses'
+    elif corpus == corpus_enum.Corpus.REUTERS:
+        file_name = 'reuters'
+
+    with open('./'+ file_name + '_bigram_language_model.json', 'w') as file:
         json.dump(bigram_language_model, file, indent=2)
 
 build_bigram_language_module(corpus_enum.Corpus.REUTERS, True, False, True)
+build_bigram_language_module(corpus_enum.Corpus.COURSES, True, False, True)
