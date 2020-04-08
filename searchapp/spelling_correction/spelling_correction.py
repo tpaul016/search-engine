@@ -2,6 +2,7 @@ import os
 import numpy as np
 import heapq
 from searchapp.index_and_dict import indexAccess
+from ..cor_access import corpus_enum
 import re
 from nltk.metrics import edit_distance
 
@@ -9,14 +10,20 @@ from nltk.metrics import edit_distance
 insert_costs = np.ones(128, dtype=np.float64)
 
 # inspired by https://docs.python.org/3/library/heapq.html#heapq.nsmallest
-def check_spelling(input, N, model):
-    print(model)
+def check_spelling(input, N, model, corpus):
     input = input.lstrip().rstrip()
     input_terms = input.split(' ')
-    if model == 'bool':
-        return check_spelling_bool(input_terms, N)
 
-    path_to_index = os.path.join(os.getcwd(), 'searchapp','index_and_dict', 'index.json')
+    if corpus is corpus_enum.Corpus.COURSES:
+        file_name = 'courseIndex.json'
+    elif corpus is corpus_enum.Corpus.REUTERS:
+        file_name = 'reutersIndex.json'
+
+    if model == 'bool':
+        return check_spelling_bool(input_terms, N, file_name)
+
+
+    path_to_index = os.path.join(os.getcwd(), 'searchapp','index_and_dict', file_name)
     index = indexAccess.getInvertedIndex(path_to_index=path_to_index)
 
     mispelled_term = False
@@ -40,8 +47,8 @@ def check_spelling(input, N, model):
     formatted_suggestions = format_suggestions(suggestions, len(input_terms), N)
     return formatted_suggestions
 
-def check_spelling_bool(input_terms, N):
-    path_to_index = os.path.join(os.getcwd(), 'searchapp','index_and_dict', 'index.json')
+def check_spelling_bool(input_terms, N, file_name):
+    path_to_index = os.path.join(os.getcwd(), 'searchapp','index_and_dict', file_name)
     index = indexAccess.getInvertedIndex(path_to_index=path_to_index)
 
     mispelled_term = False
