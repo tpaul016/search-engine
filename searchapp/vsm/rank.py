@@ -45,7 +45,6 @@ def buildDF(query_list, inverIndex):
 
             temp_arr[doc_id_index][query_index] = doc["tfidf"]
     df = DataFrame(data=temp_arr, index=index, columns=query_list)
-    print(df)
     return df
 
 
