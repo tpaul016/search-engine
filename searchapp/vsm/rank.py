@@ -8,31 +8,46 @@ from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
 
 
-def buildDF(queryList, inverIndex):
-    """Create new DataFrame with entries containing tf weights
+def buildDF(query_list, inverIndex):
+    """Create new DataFrame with entries containing tfidf weights
 
     Args:
         queryList: List of query strings
     Returns:
-        DataFrame containing tf weights as entries
+        DataFrame containing tfidf weights as entries
 
     """
-    # Populates DataFrame with tf values
-    df = DataFrame(columns=queryList)
-    for query in queryList:
-        for doc in inverIndex[query]["docs"]:
-            docId = doc["name"]
-            if not docId in df.index:
-                # Add new row to our DataFrame
-                newRow = DataFrame([[0]*len(queryList)], columns=queryList, index=[docId])
-                df = df.append(newRow)
-            df.loc[docId, query] = doc["tf"]
-    #print("original")
-    #print(df)
-    df = reWeightDataFrame(df, inverIndex)
-    #print("reweighted")
-    #print(df)
+
+    query_map = {}
+    for i, word in enumerate(query_list):
+        query_map[word] = i
+
+    # Keep map of doc_ids to indicies
+    index_map = {}
+    index = []
+
+    # Create a dataframe from this later
+    temp_arr = []
+
+    # Store all tfidf values in tmp_arr
+    for word in query_list:
+        for doc in inverIndex[word]["docs"]:
+            doc_id = doc["name"]
+            if not index_map.get(doc_id):
+                # Add new row to our temp array
+                new_row = [0] * len(query_list)
+                temp_arr.append(new_row)
+                index_map[doc_id] = len(index)
+                index.append(doc_id)
+
+            doc_id_index = index_map[doc_id]
+            query_index = query_map[word]
+
+            temp_arr[doc_id_index][query_index] = doc["tfidf"]
+    df = DataFrame(data=temp_arr, index=index, columns=query_list)
+    print(df)
     return df
+
 
 def preproc_query(query, inverIndex):
     """ Convert query to list of strings and a vector
@@ -113,24 +128,6 @@ def tfidf(tf, N, docFreq):
     #weight = math.log(1 + tf, 10) * math.log((N+1)/docFreq)
     weight = tf * math.log((N+1)/docFreq, 10)
     return weight
-
-def reWeightDataFrame(df, inverIndex):
-    """Create new DataFrame with entries containing tf-idf weights
-
-    Args:
-        df: The original DataFrame with tf values
-    Returns:
-        DataFrame containing tf-idf weights
-
-    """
-    reWeightedDf = DataFrame(index=df.index, columns=df.columns)
-    N, columns = df.shape
-    for index, row in df.iterrows():
-        for column in df.columns:
-            docFreq = inverIndex[column]["docFreq"]
-            tf = df.loc[row.name, column]
-            reWeightedDf.loc[row.name, column] = tfidf(tf, N, docFreq)
-    return reWeightedDf
 
 
 def cosSim(queryVec, docVec, file_name):
