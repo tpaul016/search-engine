@@ -16,7 +16,6 @@ build/
 .idea
 .vscode
 
-corpus
 *.log
 
 .DS_Store
