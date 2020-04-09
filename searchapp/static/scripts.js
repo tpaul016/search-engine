@@ -23,6 +23,11 @@ var currentCorpus = ''
 function querySubmit(ev) {
     ev.preventDefault();
     currentCorpus = document.getElementById('coursesButton').checked ? 'courses/' : 'reuters/'
+
+    divDocList.innerHTML = '';
+    let spinner = document.getElementById("spinner");
+    spinner.style.display = "block";
+
     fetch(baseURL + "docs", {
         method: 'POST',
         body: new FormData(this)
@@ -36,6 +41,8 @@ function querySubmit(ev) {
         while (divDocList.hasChildNodes()) {
             divDocList.removeChild(divDocList.firstChild);
         }
+
+        spinner.style.display = "none";
 
         data.forEach(doc => {
             newDiv = document.createElement("div")
@@ -75,6 +82,7 @@ function querySubmit(ev) {
         })
     })
     .catch(error => {
+        spinner.style.display = "none";
         console.log("Query: Request failed", error)
     });
 }
