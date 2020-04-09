@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 import nltk
+from nltk.corpus import wordnet as wn
 import os
 from .index_and_dict import indexAndDictBuilder, biIndex
 from .cor_pre_proc import pre_processing
@@ -8,6 +9,7 @@ from .cor_access import corpusAccess, corpus_enum
 from .spelling_correction import spelling_correction
 from .boolean_retrieval_model import query_pre_processing
 from .boolean_retrieval_model import query_retrieval
+from .query_expan import glob_query_expan
 from .vsm import rank
 from .relevance_feedback import relevance_index_access
 from .query_completion_module import completion_suggestions
@@ -17,6 +19,7 @@ def create_app(test_config=None):
     if not (os.environ.get('FLASK_ENV') == 'development'):
         nltk.download('punkt')  # Required for word tokenize
         nltk.download('stopwords')  # Required for stopword set
+        nltk.download('wordnet')
 
         #print("Creating app ...")
         #pre_processing.createCourseCorpus("searchapp/cor_pre_proc/")
@@ -41,6 +44,9 @@ def create_app(test_config=None):
 
 app = create_app()
 
+# https://stackoverflow.com/questions/47932025/fastest-way-to-check-if-word-is-in-nltk-synsets
+all_lemmas = set(wn.all_lemma_names())
+
 if app.config['DEBUG'] == True:
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
@@ -63,13 +69,13 @@ def getDocument(corpus, docId):
         return jsonify("Invalid corpus")
 
 
-
 @app.route('/docs', methods=['POST'])
 def handleQuery():
 
     query = request.form["query"]
     model = request.form["model"]
     collection = request.form["collection"]
+    expand_query = request.form.get("globExpan")
     corpus = get_corpus_enum(collection)
     docs = []
 
@@ -79,6 +85,10 @@ def handleQuery():
         corpus = corpus_enum.Corpus.REUTERS
     else:
         print("No match for Corpus!!!!!")
+
+    if expand_query == "on":
+        query = glob_query_expan.expand_query(query, model, 5, all_lemmas, corpus, 0.75)
+        print("Global Expansion: Expanded Query", query)
 
     if model == "boolean":
         formatted_query = query_pre_processing.get_query_documents(query, corpus)
@@ -91,6 +101,7 @@ def handleQuery():
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
+    
     jsonDocs = jsonify(docs)
     return jsonDocs
 
@@ -128,6 +139,7 @@ def handleRelevance():
     relevance_index_access.update(query, docId, type, checked)
     return jsonify('updated')
 
+  
 @app.route('/localquerycompletion', methods=['POST'])
 def localQueryCompletion():
     query = request.form["query"]

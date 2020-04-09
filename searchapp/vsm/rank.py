@@ -2,9 +2,11 @@ from .. index_and_dict import indexAccess
 import numpy as np
 from pandas import DataFrame
 import math
+import re
 from collections import OrderedDict
 from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
+
 
 def buildDF(queryList, inverIndex):
     """Create new DataFrame with entries containing tf weights
@@ -32,8 +34,8 @@ def buildDF(queryList, inverIndex):
     #print(df)
     return df
 
-def preProcQuery(query, inverIndex):
-    """Convert query to list of strings and DROPS words not in Index
+def preproc_query(query, inverIndex):
+    """ Convert query to list of strings and a vector
 
     Args:
         query: The query string
@@ -41,15 +43,59 @@ def preProcQuery(query, inverIndex):
         Query as list of strings
 
     """
-    queryList = query.split()
-    cleanedQueryList = []
-    for query in queryList:
-        query = langProcess.stem(query)
-        if inverIndex.get(query):
-            cleanedQueryList.append(query)
+    print(query)
+    query_list = query.split()
+    ord_dict = OrderedDict()
+
+    for index, word in enumerate(query_list):
+        # Handle weights in query string
+        word = langProcess.stem(word)
+        if inverIndex.get(word):
+            if ord_dict.get(word):
+                ord_dict[word] += 1
+            else:
+                ord_dict[word] = 1
         else:
-            print("Dropped:", query)
-    return cleanedQueryList
+            print("Dropped:", word)
+            
+    cleaned_query_list = []
+    query_vector = []
+    for key, value in ord_dict.items():
+        cleaned_query_list.append(key)
+        query_vector.append(value)
+    return cleaned_query_list, query_vector
+
+def preproc_weighted_query(query, inverIndex):
+    """ Convert weighted query to list of strings and a vector
+
+    Args:
+        query: The query string
+    Returns:
+        Query as list of strings
+
+    """
+    query_list = query.split()
+    ord_dict = OrderedDict()
+
+    for index, elem in enumerate(query_list):
+        if '(' in elem:
+            # Handle weights in query string
+            elem = re.sub(r"\(|\)", "", elem)
+            word = langProcess.stem(query_list[index - 1])
+            if inverIndex.get(word):
+                if ord_dict.get(word):
+                    ord_dict[word] += float(elem)
+                else:
+                    ord_dict[word] = float(elem)
+            else:
+                print("Dropped:", elem)
+
+    cleaned_query_list = []
+    query_vector = []
+    for key, value in ord_dict.items():
+        cleaned_query_list.append(key)
+        query_vector.append(value)
+    return cleaned_query_list, query_vector
 
 def tfidf(tf, N, docFreq):
     """Calculate tf-idf value
@@ -86,28 +132,6 @@ def reWeightDataFrame(df, inverIndex):
             reWeightedDf.loc[row.name, column] = tfidf(tf, N, docFreq)
     return reWeightedDf
 
-def strListToVec(strList):
-    """Convert a list of strings to a vector
-
-    Args:
-        strList: List of strings 
-    Returns:
-        List of integers that represent the occurence of 
-        each unique word
-
-    """
-    ordDict = OrderedDict()
-    for word in strList: 
-        if ordDict.get(word):
-            ordDict[word] += 1
-        else:
-            ordDict[word] = 1
-    queryVec = []
-    for value in ordDict.values():
-        queryVec.append(value)
-    print(queryVec)
-
-    return queryVec
 
 def cosSim(queryVec, docVec, file_name):
     """Calculate the cosine similarity of two vectors
@@ -140,16 +164,20 @@ def rank(query, collection, corpus):
         file_name = 'reutersIndex.json'
 
     inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
-    queryList = preProcQuery(query, inverIndex)
-    df = buildDF(queryList, inverIndex)
+    if "(" in query:
+        # Weighted Query
+        query_list, query_vec = preproc_weighted_query(query, inverIndex)
+    else:
+        # Unweighted query
+        query_list, query_vec = preproc_query(query, inverIndex)
+    #print(query_list, query_vec)
+    df = buildDF(query_list, inverIndex)
     rows, columns = df.shape
-    queryVec = strListToVec(queryList)
     rankedDictList = []
 
-    first = True
     for index, row in df.iterrows():
         docVec = row.to_numpy()
-        score = cosSim(queryVec, docVec, corpus)
+        score = cosSim(query_vec, docVec, corpus)
         docId = row.name.split(".")[0]
         excerpt = corpusAccess.getDocExcerpt(docId, corpus)
         newDict = {"docId": docId, "excerpt": excerpt, "score": score} 
