@@ -167,8 +167,10 @@ inputQuery.onkeyup = (e) => {
     if (e.keyCode == 32 || e.key == ' ') queryCompletion(inputQuery.value);
 }
 
-
 function queryCompletion(input) {
+    let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm';
+    if (model == 'bool') return;
+
     input = input.trim();
     let suggestionList = document.getElementById('querySuggestionList');
     if (input.length == 0) {
@@ -178,12 +180,6 @@ function queryCompletion(input) {
 
     lastInputToken = input.split(' ');
     lastInputToken = lastInputToken[lastInputToken.length-1];
-
-    let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm';
-    if (model == 'bool' && (lastInputToken == 'AND' || lastInputToken == 'OR' || lastInputToken == 'AND_NOT' || lastInputToken == '(' || lastInputToken == ')')) {
-        suggestionList.innerHTML = '';
-        return;
-    }
 
     let corpus = document.getElementById('coursesButton').checked ? 'courses' : 'reuters';
     let completionForm = new FormData();
@@ -215,4 +211,11 @@ function queryCompletion(input) {
         .catch((error) => {
             console.log(error);
         });
+}
+
+function hideSuggestions() {
+    let suggestionsTitle = document.getElementById('suggestionsTitle');
+    suggestionsTitle.style.display = "none";
+    let suggestionList = document.getElementById('querySuggestionList');
+    suggestionList.innerHTML = '';
 }

@@ -139,7 +139,6 @@ def handleRelevance():
     relevance_index_access.update(query, docId, type, checked)
     return jsonify('updated')
 
-  
 @app.route('/localquerycompletion', methods=['POST'])
 def localQueryCompletion():
     query = request.form["query"]
