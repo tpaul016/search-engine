@@ -1,12 +1,13 @@
 from .. index_and_dict import indexAccess
 import numpy as np
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import math
 import re
 from collections import OrderedDict
 from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
 from .. knn import classified_acc as class_acc
+from .. relevance_feedback import relevance_index_access as relev
 
 
 def buildDF(query_list, inverIndex, need_topics):
@@ -152,7 +153,73 @@ def cosSim(queryVec, docVec, file_name):
         (np.sqrt(np.dot(queryVec, queryVec)) * np.sqrt(np.dot(docVec, docVec)))
     return cosSim
 
-def rank(query, amount, corpus, need_topics, topics):
+
+def get_sum(docs, df, length):
+    sum = Series([])
+    if length > 0:
+        for doc in docs:
+            sum = sum.add(df.loc[doc + ".xml"], fill_value=0)
+        return sum
+    else:
+        return [0]*length
+    
+    
+
+
+def adjust_weight(original_query, query_vec, corpus, alpha, beta, gamma, df):
+    """
+        Rocchio
+    """
+
+    relev_index = relev.get_relevance_index()
+    if relev_index.get(original_query):
+        rel_docs_list = relev_index[original_query]["relevantDocs"][corpus]
+        nonrel_docs_list = relev_index[original_query]["nonRelevantDocs"][corpus]
+        num_rel_docs = len(rel_docs_list)
+        num_non_rel = len(nonrel_docs_list)
+
+        if num_rel_docs > 0 or num_non_rel > 0:
+            # Sum the tf-idfs of all the relevent and nonrelevant
+            # documents
+            rel_sum = get_sum(rel_docs_list, df, num_rel_docs)
+            non_rel_sum = get_sum(nonrel_docs_list, df, num_non_rel)
+            
+            term2 = []
+            term3 = []
+            for rel_tfidf, non_rel_tfidf in zip(rel_sum, non_rel_sum):
+                if num_rel_docs > 0:
+                    # Create term2 vector
+                    # beta*(1/|Dr|)*Sum{dj in rel}(dj)
+                    term2.append(rel_tfidf * beta * (1/num_rel_docs))
+                else:
+                    term2.append(0)
+                if num_non_rel > 0:
+                    # Create term3 vector
+                    # gamma*(1/|Dnr|)*Sum{dj in non rel}(dj)
+                    term3.append(-non_rel_tfidf * gamma * (1/num_non_rel))
+                else:
+                    term3.append(0)
+
+            # Create term 1 vector
+            # alpha * q0
+            term1 = [num * alpha for num in query_vec]
+            #print("Rocchio:") 
+            #print("term1:", term1)
+            #print("term2:", term2)
+            #print("term3:", term3)
+            # Sum the terms
+            result = [t1 + t2 + t3 for t1, t2, t3 in zip(term1, term2, term3)]
+
+            return result
+        else:
+            # If theres no relevant or non relevant documents then don't adjust
+            print("Rocchio: No relevant or non-relevant documents")
+            return query_vec
+    print("Rocchio: No matching query")
+    return query_vec
+
+
+def rank(query, original_query, amount, corpus, need_topics, topics):
     """Produce rankings for the query
 
     Args:
@@ -163,10 +230,16 @@ def rank(query, amount, corpus, need_topics, topics):
         List of Dicts {docId:, excerpt:, score:}
 
     """
+
     if corpus is corpus_enum.Corpus.COURSES:
         file_name = 'courseIndex.json'
+        corpus_str = "courses"
     elif corpus is corpus_enum.Corpus.REUTERS:
         file_name = 'reutersIndex.json'
+        corpus_str = "reuters"
+
+    alpha, beta, gamma = relev.get_constants(corpus)
+    print("alpha", alpha, "beta:", beta, "gamma:", gamma)
 
     inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
     if "(" in query:
@@ -179,6 +252,9 @@ def rank(query, amount, corpus, need_topics, topics):
     df = buildDF(query_list, inverIndex, need_topics)
     rows, columns = df.shape
     rankedDictList = []
+    query_vec = adjust_weight(original_query, query_vec, corpus_str, alpha, beta, gamma, df)
+    print("query list:", query_list)
+    print("query vector:", query_vec)
 
     for index, row in df.iterrows():
         docVec = row.to_numpy()
