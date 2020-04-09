@@ -83,6 +83,7 @@ function querySubmit(ev) {
     })
     .catch(error => {
         spinner.style.display = "none";
+        divDocList.innerHTML = "<p><strong>An error occurred while completing the query :'(</strong></p>";
         console.log("Query: Request failed", error)
     });
 }
