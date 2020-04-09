@@ -10,6 +10,7 @@ from .boolean_retrieval_model import query_pre_processing
 from .boolean_retrieval_model import query_retrieval
 from .vsm import rank
 from .relevance_feedback import relevance_index_access
+from .query_completion_module import completion_suggestions
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
@@ -126,3 +127,14 @@ def handleRelevance():
 
     relevance_index_access.update(query, docId, type, checked)
     return jsonify('updated')
+
+@app.route('/localquerycompletion', methods=['POST'])
+def localQueryCompletion():
+    query = request.form["query"]
+    model = request.form["model"]
+    collection = request.form["collection"]
+    corpus = get_corpus_enum(collection)
+
+    suggestions = completion_suggestions.get_suggestions(query=query, model=model, corpus=corpus, n_suggestions=5)
+
+    return jsonify(suggestions)
