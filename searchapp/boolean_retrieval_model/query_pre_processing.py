@@ -97,9 +97,9 @@ def get_query_documents(query, corpus):
                     doc_entry['score'] = 1
                     docs.append(doc_entry)
                 formatted_query.append(docs)
-            except:
-                print(token)
-                raise KeyError(token + ' not in index')
+            except Exception as e:
+                print(e)
+                print(token + ' not in the index')
 
     return formatted_query
 
