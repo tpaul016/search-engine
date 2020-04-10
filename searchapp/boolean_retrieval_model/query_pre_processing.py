@@ -1,4 +1,4 @@
-from searchapp.index_and_dict import indexAccess
+from searchapp.index_and_dict import indexAccess, indexAndDictBuilder
 import os
 from searchapp.cor_access import corpusAccess
 from ..cor_access import corpus_enum
@@ -86,6 +86,8 @@ def get_query_documents(query, corpus):
         if token == 'AND' or token == 'OR' or token == 'AND_NOT':
             formatted_query.append(token)
         else:
+            token, ok = indexAndDictBuilder.preprocToken(token, stopword=False, stem=True, norm=True)
+
             try:
                 docs = []
                 for doc in index[token]['docs']:
