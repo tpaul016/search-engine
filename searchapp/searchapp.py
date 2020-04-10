@@ -97,7 +97,7 @@ def handleQuery():
         print("Boolean")
         print("--------------------------------")
     elif model == "vsm":
-        docs = rank.rank(query, collection, corpus)
+        docs = rank.rank(query, 10, corpus, False)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
