@@ -1,17 +1,16 @@
 from searchapp.index_and_dict import indexAccess, indexAndDictBuilder
 import os
-from searchapp.cor_access import corpusAccess
-from ..cor_access import corpus_enum
+from searchapp.cor_access import corpusAccess, corpus_enum
 
 # inspired by https://runestone.academy/runestone/books/published/pythonds/BasicDS/InfixPrefixandPostfixExpressions.html
-def query_to_postfix(query):
+def query_to_postfix(query, corpus):
     new_query = []
     op_stack = []
     query = query.split(' ')
 
-    # wildcard managment
-    for i, word in enumerate(query):
-        if '*' in word:
+    # stemming and wildcard management
+    for i, word in enumerate(query[:]):
+        if not(word == 'AND' or word == 'OR' or word == 'AND_NOT'):
             front_pars_num = word.count('(')
             if front_pars_num > 0:
                 word = word.replace('(', '')
@@ -19,29 +18,44 @@ def query_to_postfix(query):
             if rear_pars_num > 0:
                 word = word.replace(')', '')
 
-            formatted_words = handle_wildcard(word)
-            if len(formatted_words) == 0:
-                query[i] = None
-            for j, f_word in enumerate(formatted_words):
-                if j == 0:
-                    pars = ''
-                    if len(formatted_words) == 1 and rear_pars_num > 0:
-                        for x in range(rear_pars_num):
-                            pars += ')'
-                        query[i] = f_word + pars
-                    elif front_pars_num > 0:
-                        for x in range(front_pars_num):
-                            pars += '('
-                        query[i] = pars + f_word
-                    else:
-                        query[i] = f_word
-                else:
-                    if j == len(formatted_words)-1 and rear_pars_num > 0:
+            if '*' in word:
+                formatted_words = handle_wildcard(word, corpus)
+                if len(formatted_words) == 0:
+                    query[i] = None
+                for j, f_word in enumerate(formatted_words):
+                    if j == 0:
                         pars = ''
-                        for x in range(rear_pars_num):
-                            pars += ')'
-                        f_word += pars
-                    query.insert(i+j, f_word)
+                        if len(formatted_words) == 1 and rear_pars_num > 0:
+                            for x in range(rear_pars_num):
+                                pars += ')'
+                            query[i] = f_word + pars
+                        elif front_pars_num > 0:
+                            for x in range(front_pars_num):
+                                pars += '('
+                            query[i] = pars + f_word
+                        else:
+                            query[i] = f_word
+                    else:
+                        if j == len(formatted_words) - 1 and rear_pars_num > 0:
+                            pars = ''
+                            for x in range(rear_pars_num):
+                                pars += ')'
+                            f_word += pars
+                        query.insert(i + j, f_word)
+            else:
+                formatted_word, ok = indexAndDictBuilder.preprocToken(word, stopword=False, stem=True, norm=True)
+
+                if front_pars_num > 0:
+                    word_par = ''
+                    for i in range(front_pars_num):
+                        word_par += '('
+                    word_par += formatted_word
+                elif rear_pars_num > 0:
+                    word_par = formatted_word
+                    for i in range(rear_pars_num):
+                        word_par += ')'
+
+                query[i] = word_par
 
     for token in query:
         if token == 'AND' or token == 'OR' or token == 'AND_NOT':
@@ -71,7 +85,7 @@ def query_to_postfix(query):
     return new_query
 
 def get_query_documents(query, corpus):
-    query = query_to_postfix(query)
+    query = query_to_postfix(query, corpus)
     formatted_query = []
 
     if corpus is corpus_enum.Corpus.COURSES:
@@ -86,8 +100,6 @@ def get_query_documents(query, corpus):
         if token == 'AND' or token == 'OR' or token == 'AND_NOT':
             formatted_query.append(token)
         else:
-            token, ok = indexAndDictBuilder.preprocToken(token, stopword=False, stem=True, norm=True)
-
             try:
                 docs = []
                 for doc in index[token]['docs']:
@@ -103,10 +115,15 @@ def get_query_documents(query, corpus):
 
     return formatted_query
 
-def handle_wildcard(word):
+def handle_wildcard(word, corpus):
     bigrams = create_bigrams(word)
 
-    path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', 'biIndex.json')
+    if corpus is corpus_enum.Corpus.COURSES:
+        file_name = 'courseBiIndex.json'
+    elif corpus is corpus_enum.Corpus.REUTERS:
+        file_name = 'reutersBiIndex.json'
+
+    path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', file_name)
     bi_index = indexAccess.get_bigram_index(path_to_index=path_to_index)
 
     try:
