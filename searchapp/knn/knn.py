@@ -1,5 +1,5 @@
 from searchapp.cor_access import corpusAccess, corpus_enum
-from searchapp.vsm import rank as vsm
+from . knn_rank import rank
 from searchapp.index_and_dict import indexAndDictBuilder as ind
 from multiprocessing import Pool
 from collections import Counter
@@ -7,11 +7,19 @@ from os import chdir, listdir, getcwd
 import nltk
 import json
 
-def knn():
+contents_map = {}
+inverIndex = {}
+
+def knn(index, c_map):
     """
         Classify all of our documents
         Writes to file each document and its classified or already set topic
     """
+    global contents_map
+    global inverIndex
+    contents_map = c_map
+    inverIndex = index
+
     path = "searchapp/cor_pre_proc/reuters/processed/"
     currDir = getcwd()
     chdir(path)
@@ -23,7 +31,7 @@ def knn():
     testing_set = []
     for f in fileNameList:
         doc_id = f.split(".")[0]
-        topic = corpusAccess.getTopicsReuters(doc_id)
+        topic = contents_map[doc_id]["topics"]
         if topic is None:
             testing_set.append(doc_id)
         else:
@@ -38,16 +46,16 @@ def knn():
 
     # Add all the courses in the training set
     for doc in training_set:
-        topic = corpusAccess.getTopicsReuters(doc)
+        topic = contents_map[doc]["topics"]
         if topic is None:
             print("Doc with no topic in training set!")
             break
         if "," in topic:
             topics_map[doc] = topic.split(",")
         else:
-            topics_map[doc] = [topic]
+            topics_map[doc] = topic
 
-    with open("searchapp/knn/classified_docs.json", 'w') as f:
+    with open("searchapp/knn/exp_classified_docs.json", 'w') as f:
         json.dump(topics_map, f, indent=2, sort_keys=True)
 
 
@@ -55,15 +63,8 @@ def classify(f):
     """
         Classify one document
     """
-    query = ""
-    body = corpusAccess.getContentsReuters(f)
-    tokens = nltk.word_tokenize(body)
-    for token in tokens:
-        # Apply same preprocessing as inverted index
-        token, ok = ind.preprocToken(token, True, True, True)
-        if not ok:
-            continue
-        query += " " + token
+    global contents_map
+    body = contents_map[f]["content"]
 
     # Input body of our document as the query to VSM 
     # to get the similarity to every other document
@@ -72,21 +73,20 @@ def classify(f):
     # ranks documents with topics (in our training set)
     #
     # We ask for the top 5 documents (k = 5)
-    ranking = vsm.rank(query, 5, corpus_enum.Corpus.REUTERS, True, [])
-
+    ranking = rank(body, 5, corpus_enum.Corpus.REUTERS, True, inverIndex, contents_map)
+    
     cand_topics = []
     # Get all the topics from our 5 documents
     for doc in ranking:
-        topic = corpusAccess.getTopicsReuters(doc["docId"])
+        topic = contents_map[doc["docId"]]["topics"]
         if topic is None:
-            continue
-        # We get the topics as a string
-        # Must split on comma to get each topic
-        if "," in topic:
-            new_cand_topics = topic.split(",")
-            cand_topics += new_cand_topics
-        else:
-            cand_topics.append(topic)
+            print(doc, "has no topic!")
+            break
+        elif len(topic) == 0:
+            print(doc, "has no topic!")
+            break
+        cand_topics += topic
+
 
     # From all of our topics take the topic that occurs the most
     c = Counter(cand_topics)
