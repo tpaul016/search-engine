@@ -54,6 +54,8 @@ def query_to_postfix(query, corpus):
                     word_par = formatted_word
                     for i in range(rear_pars_num):
                         word_par += ')'
+                else:
+                    word_par = formatted_word
 
                 query[i] = word_par
 
