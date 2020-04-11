@@ -9,7 +9,7 @@ from .cor_access import corpusAccess, corpus_enum
 from .spelling_correction import spelling_correction
 from .boolean_retrieval_model import query_pre_processing
 from .boolean_retrieval_model import query_retrieval
-from .query_expan import glob_query_expan
+from .query_expan import glob_query_expan, loc_query_expan
 from .vsm import rank
 from .relevance_feedback import relevance_index_access
 from .query_completion_module import completion_suggestions
@@ -88,6 +88,13 @@ def handleQuery():
     else:
         print("No match for Corpus!!!!!")
 
+    if model == "vsm" and expand_query == "on":
+        rochio_addition = loc_query_expan.local_expan(query, corpus, weight=1)
+    elif model == "vsm":
+        rochio_addition = loc_query_expan.local_expan(query, corpus, weight=0)
+    original_query = query
+    print("Rocchio additions:", rochio_addition)
+
     if expand_query == "on":
         query = glob_query_expan.expand_query(query, model, 5, all_lemmas, corpus, 0.75)
         print("Global Expansion: Expanded Query", query)
@@ -102,19 +109,20 @@ def handleQuery():
             doc_map = class_acc.get_doc_map()
             for doc in cand_docs:
                 if class_acc.has_topic(topics, doc["docId"], doc_map):
-                    docs.append(doc)                                                                                                                                                                                  
+                    docs.append(doc)
             
         print("--------------------------------")
         print("Boolean")
         print("--------------------------------")
     elif model == "vsm":
-        docs = rank.rank(query, 10, corpus, False, topics)
+        docs = rank.rank(query + rochio_addition, original_query, 10, corpus, False, topics)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
     
     jsonDocs = jsonify(docs)
     return jsonDocs
+
 
 def get_corpus_enum(corpus_string):
     if corpus_string == "courses":
@@ -145,9 +153,10 @@ def handleRelevance():
     docId = request.args.get('docId')
     type = request.args.get('type')
     checked = request.args.get('checked') == "true"
+    corpus = request.args.get('corpus')
     print(query)
 
-    relevance_index_access.update(query, docId, type, checked)
+    relevance_index_access.update(query, docId, type, checked, corpus)
     return jsonify('updated')
 
 @app.route('/localquerycompletion', methods=['POST'])

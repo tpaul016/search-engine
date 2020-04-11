@@ -93,7 +93,7 @@ function handleRelevanceFeedback(event) {
     let docId = event.value;
     let type = event.className;
 
-    fetch(baseURL + "relevance?query=" + inputQuery.value + "&docId=" + docId + "&checked=" + checked + "&type=" + type, {
+    fetch(baseURL + "relevance?query=" + inputQuery.value + "&docId=" + docId + "&checked=" + checked + "&type=" + type + "&corpus=" + currentCorpus, {
         method: 'PUT',
     })
     .then(response => {
