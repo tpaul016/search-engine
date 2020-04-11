@@ -7,7 +7,6 @@ from os import chdir, listdir, getcwd
 import nltk
 import json
 
-
 def knn():
     path = "searchapp/cor_pre_proc/reuters/processed/"
     currDir = getcwd()

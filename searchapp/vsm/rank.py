@@ -6,6 +6,7 @@ import re
 from collections import OrderedDict
 from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
+from .. knn import classified_acc as class_acc
 
 
 def buildDF(query_list, inverIndex, need_topics):
@@ -151,7 +152,7 @@ def cosSim(queryVec, docVec, file_name):
         (np.sqrt(np.dot(queryVec, queryVec)) * np.sqrt(np.dot(docVec, docVec)))
     return cosSim
 
-def rank(query, amount, corpus, need_topics):
+def rank(query, amount, corpus, need_topics, topics):
     """Produce rankings for the query
 
     Args:
@@ -192,8 +193,20 @@ def rank(query, amount, corpus, need_topics):
 
     if amount > len(rankedDictList):
         amount = len(rankedDictList)
+    result = []
 
-    result = rankedDictList[0:amount]
+    # Check if docs have any of the topics
+    if len(topics) >0:
+        count = 0
+        doc_map = class_acc.get_doc_map()
+        for doc in rankedDictList:
+            if class_acc.has_topic(topics, doc["docId"], doc_map):
+                result.append(doc)
+                count = count + 1
+                if count == amount:
+                    break
+    else:
+        result = rankedDictList[0:amount]
 
     return(result)
 
