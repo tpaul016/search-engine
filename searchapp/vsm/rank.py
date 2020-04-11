@@ -6,9 +6,10 @@ import re
 from collections import OrderedDict
 from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
+from .. knn import classified_acc as class_acc
 
 
-def buildDF(query_list, inverIndex):
+def buildDF(query_list, inverIndex, need_topics):
     """Create new DataFrame with entries containing tfidf weights
 
     Args:
@@ -33,6 +34,14 @@ def buildDF(query_list, inverIndex):
     for word in query_list:
         for doc in inverIndex[word]["docs"]:
             doc_id = doc["name"]
+            
+            # Only interested in documents that have topics (kNN)
+            if need_topics:
+                split_doc_id = doc_id.split(".")[0]
+                topic = corpusAccess.getTopicsReuters(split_doc_id)
+                if topic is None:
+                    continue
+
             if not index_map.get(doc_id):
                 # Add new row to our temp array
                 new_row = [0] * len(query_list)
@@ -57,7 +66,6 @@ def preproc_query(query, inverIndex):
         Query as list of strings
 
     """
-    print(query)
     query_list = query.split()
     ord_dict = OrderedDict()
 
@@ -69,8 +77,8 @@ def preproc_query(query, inverIndex):
                 ord_dict[word] += 1
             else:
                 ord_dict[word] = 1
-        else:
-            print("Dropped:", word)
+        #else:
+        #    print("Dropped:", word)
             
     cleaned_query_list = []
     query_vector = []
@@ -144,12 +152,13 @@ def cosSim(queryVec, docVec, file_name):
         (np.sqrt(np.dot(queryVec, queryVec)) * np.sqrt(np.dot(docVec, docVec)))
     return cosSim
 
-def rank(query, collection, corpus):
+def rank(query, amount, corpus, need_topics, topics):
     """Produce rankings for the query
 
     Args:
         query: The query string
-        collection: The collection you want to search over (reuters, courses)
+        amount: amount of results
+        corpus: The corpus you want to search over (reuters, courses)
     Returns:
         List of Dicts {docId:, excerpt:, score:}
 
@@ -167,7 +176,7 @@ def rank(query, collection, corpus):
         # Unweighted query
         query_list, query_vec = preproc_query(query, inverIndex)
     #print(query_list, query_vec)
-    df = buildDF(query_list, inverIndex)
+    df = buildDF(query_list, inverIndex, need_topics)
     rows, columns = df.shape
     rankedDictList = []
 
@@ -181,6 +190,23 @@ def rank(query, collection, corpus):
 
     # Inspired from https://stackoverflow.com/questions/72899/how-do-i-sort-a-list-of-dictionaries-by-a-value-of-the-dictionary
     rankedDictList = sorted(rankedDictList, key=lambda k: k['score'], reverse=True)
-     
-    return(rankedDictList[0:10])
+
+    if amount > len(rankedDictList):
+        amount = len(rankedDictList)
+    result = []
+
+    # Check if docs have any of the topics
+    if len(topics) >0:
+        count = 0
+        doc_map = class_acc.get_doc_map()
+        for doc in rankedDictList:
+            if class_acc.has_topic(topics, doc["docId"], doc_map):
+                result.append(doc)
+                count = count + 1
+                if count == amount:
+                    break
+    else:
+        result = rankedDictList[0:amount]
+
+    return(result)
 

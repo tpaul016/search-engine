@@ -13,6 +13,7 @@ from .query_expan import glob_query_expan
 from .vsm import rank
 from .relevance_feedback import relevance_index_access
 from .query_completion_module import completion_suggestions
+from .knn import classified_acc as class_acc
 
 def create_app(test_config=None):
     # Perform corpus and index build for the first time
@@ -77,6 +78,7 @@ def handleQuery():
     collection = request.form["collection"]
     expand_query = request.form.get("globExpan")
     corpus = get_corpus_enum(collection)
+    topics = request.form["topic"].split()
     docs = []
 
     if collection == "courses":
@@ -92,12 +94,21 @@ def handleQuery():
 
     if model == "boolean":
         formatted_query = query_pre_processing.get_query_documents(query, corpus)
-        docs = query_retrieval.execute_query(formatted_query)
+        cand_docs = query_retrieval.execute_query(formatted_query)
+        docs = []
+        if len(topics) == 0:
+            docs = cand_docs
+        else:
+            doc_map = class_acc.get_doc_map()
+            for doc in cand_docs:
+                if class_acc.has_topic(topics, doc["docId"], doc_map):
+                    docs.append(doc)                                                                                                                                                                                  
+            
         print("--------------------------------")
         print("Boolean")
         print("--------------------------------")
     elif model == "vsm":
-        docs = rank.rank(query, collection, corpus)
+        docs = rank.rank(query, 10, corpus, False, topics)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
