@@ -7,6 +7,7 @@ from .. cor_access import corpus_enum
 
 
 def expand_query(query, model, senses, all_lemmas, corpus, syn_weight):
+    print("Global Expansion: Input:", query)
     """
         Generate a new query for specified model with expansions
 
