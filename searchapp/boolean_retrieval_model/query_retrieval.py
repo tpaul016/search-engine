@@ -63,7 +63,6 @@ def operation_OR(docs1, docs2):
             j += 1
 
     res = res + docs1[i:] + docs2[j:]
-    print(res)
     return res
 
 def operation_AND_NOT(docs1, docs2):
