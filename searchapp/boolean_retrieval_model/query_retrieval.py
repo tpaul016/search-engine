@@ -44,12 +44,27 @@ def operation_AND(docs1, docs2):
                 pointer2 += 1
     return new_docs
 
+# inspired by https://www.geeksforgeeks.org/python-combining-two-sorted-lists/
+# improved vanilla system implementation to merge-sort
 def operation_OR(docs1, docs2):
-    new_docs = [doc for doc in docs2]
-    for doc in docs1:
-        if doc not in new_docs:
-            new_docs.append(doc)
-    return sorted(new_docs, key=lambda k: k['docId'])
+    size_1 = len(docs1)
+    size_2 = len(docs2)
+
+    res = []
+    i, j = 0, 0
+
+    while i < size_1 and j < size_2:
+        if docs1[i]['docId'] < docs2[j]['docId']:
+            res.append(docs1[i])
+            i += 1
+
+        else:
+            res.append(docs2[j])
+            j += 1
+
+    res = res + docs1[i:] + docs2[j:]
+    print(res)
+    return res
 
 def operation_AND_NOT(docs1, docs2):
     new_docs = []
