@@ -59,6 +59,19 @@ def getDoc(docId, corpus):
 
     return document
 
+
+def getContentsReuters(docId):
+    doc = getDoc(docId, Corpus.REUTERS)
+
+    return doc["body"]
+
+
+def getTopicsReuters(docId):
+    doc = getDoc(docId, Corpus.REUTERS)
+
+    return doc["topics"]
+
+
 def getDocExcerpt(docId, corpus):
     doc = getDoc(docId, corpus)
 
