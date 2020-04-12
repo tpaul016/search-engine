@@ -91,18 +91,24 @@ def handleQuery():
         print("Global Expansion: Expanded Query", query)
 
     if model == "boolean":
-        formatted_query = query_pre_processing.get_query_documents(query, corpus)
+        formatted_query, corrected_query = query_pre_processing.get_query_documents(query, corpus)
         docs = query_retrieval.execute_query(formatted_query)
         print("--------------------------------")
         print("Boolean")
         print("--------------------------------")
     elif model == "vsm":
-        docs = rank.rank(query, collection, corpus)
+        docs, corrected_query = rank.rank(query, collection, corpus)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
-    
-    jsonDocs = jsonify(docs)
+
+    result = {
+        'docs': docs
+    }
+    if corrected_query is not None:
+        result['corrected_query'] = corrected_query
+
+    jsonDocs = jsonify(result)
     return jsonDocs
 
 def get_corpus_enum(corpus_string):

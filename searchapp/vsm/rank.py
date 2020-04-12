@@ -6,6 +6,7 @@ import re
 from collections import OrderedDict
 from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
+from searchapp.spelling_correction import spelling_correction
 
 
 def buildDF(query_list, inverIndex):
@@ -48,7 +49,7 @@ def buildDF(query_list, inverIndex):
     return df
 
 
-def preproc_query(query, inverIndex):
+def preproc_query(query, inverIndex, corpus):
     """ Convert query to list of strings and a vector
 
     Args:
@@ -60,6 +61,7 @@ def preproc_query(query, inverIndex):
     print(query)
     query_list = query.split()
     ord_dict = OrderedDict()
+    spelling_error = False
 
     for index, word in enumerate(query_list):
         # Handle weights in query string
@@ -70,16 +72,27 @@ def preproc_query(query, inverIndex):
             else:
                 ord_dict[word] = 1
         else:
-            print("Dropped:", word)
-            
+            # spell correction
+            word, corrected_query = spelling_correction.correct_spelling(token=word, query=query if not spelling_error else corrected_query, corpus=corpus,
+                                                                          model='vsm')
+            spelling_error = True
+
+            if ord_dict.get(word):
+                ord_dict[word] += 1
+            else:
+                ord_dict[word] = 1
+
     cleaned_query_list = []
     query_vector = []
     for key, value in ord_dict.items():
         cleaned_query_list.append(key)
         query_vector.append(value)
-    return cleaned_query_list, query_vector
 
-def preproc_weighted_query(query, inverIndex):
+    if spelling_error:
+        return cleaned_query_list, query_vector, corrected_query
+    return cleaned_query_list, query_vector, None
+
+def preproc_weighted_query(query, inverIndex, corpus):
     """ Convert weighted query to list of strings and a vector
 
     Args:
@@ -90,6 +103,7 @@ def preproc_weighted_query(query, inverIndex):
     """
     query_list = query.split()
     ord_dict = OrderedDict()
+    spelling_error = False
 
     for index, elem in enumerate(query_list):
         if '(' in elem:
@@ -102,14 +116,24 @@ def preproc_weighted_query(query, inverIndex):
                 else:
                     ord_dict[word] = float(elem)
             else:
-                print("Dropped:", elem)
+                # spell correction
+                word, corrected_query = spelling_correction.correct_spelling(token=word, query=query if not spelling_error else corrected_query, corpus=corpus,
+                                                                             model='vsm')
+                spelling_error = True
+                if ord_dict.get(word):
+                    ord_dict[word] += 1
+                else:
+                    ord_dict[word] = 1
 
     cleaned_query_list = []
     query_vector = []
     for key, value in ord_dict.items():
         cleaned_query_list.append(key)
         query_vector.append(value)
-    return cleaned_query_list, query_vector
+
+    if spelling_error:
+        return cleaned_query_list, query_vector, corrected_query
+    return cleaned_query_list, query_vector, None
 
 def tfidf(tf, N, docFreq):
     """Calculate tf-idf value
@@ -162,10 +186,10 @@ def rank(query, collection, corpus):
     inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
     if "(" in query:
         # Weighted Query
-        query_list, query_vec = preproc_weighted_query(query, inverIndex)
+        query_list, query_vec, corrected_query = preproc_weighted_query(query, inverIndex, corpus)
     else:
         # Unweighted query
-        query_list, query_vec = preproc_query(query, inverIndex)
+        query_list, query_vec, corrected_query = preproc_query(query, inverIndex, corpus)
     #print(query_list, query_vec)
     df = buildDF(query_list, inverIndex)
     rows, columns = df.shape
@@ -181,6 +205,6 @@ def rank(query, collection, corpus):
 
     # Inspired from https://stackoverflow.com/questions/72899/how-do-i-sort-a-list-of-dictionaries-by-a-value-of-the-dictionary
     rankedDictList = sorted(rankedDictList, key=lambda k: k['score'], reverse=True)
-     
-    return(rankedDictList[0:10])
+
+    return(rankedDictList[0:10], corrected_query)
 
