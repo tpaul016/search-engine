@@ -88,6 +88,15 @@ def handleQuery():
     else:
         print("No match for Corpus!!!!!")
 
+    # spelling correction
+    if model == 'boolean':
+        corrected_query = spelling_correction.check_spelling_bool(query, corpus)
+    elif model == 'vsm':
+        corrected_query = spelling_correction.check_spelling_vsm(query, corpus)
+
+    if corrected_query is not None:
+        query = corrected_query
+
     if model == "vsm" and expand_query == "on":
         rochio_addition = loc_query_expan.local_expan(query, corpus, weight=1)
     elif model == "vsm":
@@ -99,7 +108,7 @@ def handleQuery():
         print("Global Expansion: Expanded Query", query)
 
     if model == "boolean":
-        formatted_query, corrected_query = query_pre_processing.get_query_documents(query, corpus)
+        formatted_query = query_pre_processing.get_query_documents(query, corpus)
         cand_docs = query_retrieval.execute_query(formatted_query)
         docs = []
         if len(topics) == 0:
@@ -115,7 +124,7 @@ def handleQuery():
         print("--------------------------------")
     elif model == "vsm":
         print("Rocchio additions:", rochio_addition)
-        docs, corrected_query = rank.rank(query + rochio_addition, original_query, 10, corpus, False, topics)
+        docs = rank.rank(query + rochio_addition, original_query, 10, corpus, False, topics)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")

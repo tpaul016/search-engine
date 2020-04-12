@@ -1,7 +1,6 @@
 from searchapp.index_and_dict import indexAccess, indexAndDictBuilder
 import os
 from searchapp.cor_access import corpusAccess, corpus_enum
-from searchapp.spelling_correction import spelling_correction
 
 # inspired by https://runestone.academy/runestone/books/published/pythonds/BasicDS/InfixPrefixandPostfixExpressions.html
 def query_to_postfix(query, corpus):
@@ -91,8 +90,6 @@ def get_query_documents(query, corpus):
     query_text = query
     query = query_to_postfix(query, corpus)
     formatted_query = []
-    spelling_error = False
-    corrected_query = None
 
     if corpus is corpus_enum.Corpus.COURSES:
         file_name = 'courseIndex.json'
@@ -106,10 +103,6 @@ def get_query_documents(query, corpus):
         if token == 'AND' or token == 'OR' or token == 'AND_NOT':
             formatted_query.append(token)
         else:
-            if token not in index:
-                token, corrected_query = spelling_correction.correct_spelling(token=token,query=query_text if not spelling_error else corrected_query,corpus=corpus,model='bool')
-                spelling_error = True
-
             docs = []
             for doc in index[token]['docs']:
                 doc_entry = {}
@@ -119,7 +112,7 @@ def get_query_documents(query, corpus):
                 docs.append(doc_entry)
             formatted_query.append(docs)
 
-    return formatted_query, corrected_query
+    return formatted_query
 
 def handle_wildcard(word, corpus):
     bigrams = create_bigrams(word)

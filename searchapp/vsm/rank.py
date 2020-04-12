@@ -6,7 +6,6 @@ import re
 from collections import OrderedDict
 from .. cor_access import corpusAccess, corpus_enum
 from .. langproc import langProcess
-from searchapp.spelling_correction import spelling_correction
 from .. knn import classified_acc as class_acc
 from .. relevance_feedback import relevance_index_access as relev
 
@@ -69,22 +68,11 @@ def preproc_query(query, inverIndex, corpus):
     """
     query_list = query.split()
     ord_dict = OrderedDict()
-    spelling_error = False
 
     for index, word in enumerate(query_list):
         # Handle weights in query string
         word = langProcess.stem(word)
         if inverIndex.get(word):
-            if ord_dict.get(word):
-                ord_dict[word] += 1
-            else:
-                ord_dict[word] = 1
-        else:
-            # spell correction
-            word, corrected_query = spelling_correction.correct_spelling(token=word, query=query if not spelling_error else corrected_query, corpus=corpus,
-                                                                          model='vsm')
-            spelling_error = True
-
             if ord_dict.get(word):
                 ord_dict[word] += 1
             else:
@@ -96,9 +84,7 @@ def preproc_query(query, inverIndex, corpus):
         cleaned_query_list.append(key)
         query_vector.append(value)
 
-    if spelling_error:
-        return cleaned_query_list, query_vector, corrected_query
-    return cleaned_query_list, query_vector, None
+    return cleaned_query_list, query_vector
 
 def preproc_weighted_query(query, inverIndex, corpus):
     """ Convert weighted query to list of strings and a vector
@@ -111,7 +97,6 @@ def preproc_weighted_query(query, inverIndex, corpus):
     """
     query_list = query.split()
     ord_dict = OrderedDict()
-    spelling_error = False
 
     for index, elem in enumerate(query_list):
         if '(' in elem:
@@ -123,15 +108,6 @@ def preproc_weighted_query(query, inverIndex, corpus):
                     ord_dict[word] += float(elem)
                 else:
                     ord_dict[word] = float(elem)
-            else:
-                # spell correction
-                word, corrected_query = spelling_correction.correct_spelling(token=word, query=query if not spelling_error else corrected_query, corpus=corpus,
-                                                                             model='vsm')
-                spelling_error = True
-                if ord_dict.get(word):
-                    ord_dict[word] += float(elem)
-                else:
-                    ord_dict[word] = float(elem)
 
     cleaned_query_list = []
     query_vector = []
@@ -139,9 +115,7 @@ def preproc_weighted_query(query, inverIndex, corpus):
         cleaned_query_list.append(key)
         query_vector.append(value)
 
-    if spelling_error:
-        return cleaned_query_list, query_vector, corrected_query
-    return cleaned_query_list, query_vector, None
+    return cleaned_query_list, query_vector
 
 def tfidf(tf, N, docFreq):
     """Calculate tf-idf value
@@ -267,10 +241,10 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
     inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
     if "(" in query:
         # Weighted Query
-        query_list, query_vec, corrected_query = preproc_weighted_query(query, inverIndex, corpus)
+        query_list, query_vec = preproc_weighted_query(query, inverIndex, corpus)
     else:
         # Unweighted query
-        query_list, query_vec, corrected_query = preproc_query(query, inverIndex, corpus)
+        query_list, query_vec = preproc_query(query, inverIndex, corpus)
     #print(query_list, query_vec)
     df = buildDF(query_list, inverIndex, need_topics)
     rows, columns = df.shape
@@ -307,4 +281,4 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
     else:
         result = rankedDictList[0:amount]
 
-    return(result, corrected_query)
+    return(result)
