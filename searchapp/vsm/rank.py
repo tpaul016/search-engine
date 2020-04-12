@@ -129,9 +129,9 @@ def preproc_weighted_query(query, inverIndex, corpus):
                                                                              model='vsm')
                 spelling_error = True
                 if ord_dict.get(word):
-                    ord_dict[word] += 1
+                    ord_dict[word] += float(elem)
                 else:
-                    ord_dict[word] = 1
+                    ord_dict[word] = float(elem)
 
     cleaned_query_list = []
     query_vector = []
