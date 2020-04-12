@@ -53,6 +53,7 @@ def get_synonyms(word, senses, inverIndex):
 
     # Remove words not in our index
     synonyms = remove_words_not_in_index(word, synonyms, inverIndex)
+    synonyms = synonyms[0:5]
     return synonyms
 
 
