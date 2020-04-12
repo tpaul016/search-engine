@@ -3,6 +3,7 @@ from .. cor_access import corpus_enum
 import json
 
 def local_expan(query, corpus, weight):
+    print("Local Expansion: Input:", query)
     addition = ""
     index = relev.get_relevance_index()
     if index.get(query):

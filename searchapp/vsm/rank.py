@@ -210,13 +210,15 @@ def adjust_weight(original_query, query_vec, corpus, alpha, beta, gamma, df):
             return result
         else:
             # If theres no relevant or non relevant documents then don't adjust
-            print("Rocchio: No relevant or non-relevant documents")
+            print("VSM: Rocchio: No relevant or non-relevant documents")
             return query_vec
-    print("Rocchio: No matching query")
+    print("VSM: Rocchio: No matching query")
     return query_vec
 
 
 def rank(query, original_query, amount, corpus, need_topics, topics):
+    print("VSM: Input:", query)
+    print("VSM: topics:", topics)
     """Produce rankings for the query
 
     Args:
@@ -235,9 +237,6 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
         file_name = 'reutersIndex.json'
         corpus_str = "reuters"
 
-    alpha, beta, gamma = relev.get_constants(corpus)
-    print("alpha", alpha, "beta:", beta, "gamma:", gamma)
-
     inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
     if "(" in query:
         # Weighted Query
@@ -249,9 +248,14 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
     df = buildDF(query_list, inverIndex, need_topics)
     rows, columns = df.shape
     rankedDictList = []
+
+    print("VSM: query list:", query_list)
+    print("VSM: query vector:", query_vec)
+    alpha, beta, gamma = relev.get_constants(corpus)
+    print("VSM: Rocchio Constants:", "alpha:", alpha, "beta:", beta, "gamma:", gamma)
     query_vec = adjust_weight(original_query, query_vec, corpus_str, alpha, beta, gamma, df)
-    print("query list:", query_list)
-    print("query vector:", query_vec)
+    print("VSM: After Rocchio: query list:", query_list)
+    print("VSM: After Rocchio: query vector:", query_vec)
 
     for index, row in df.iterrows():
         docVec = row.to_numpy()
@@ -269,7 +273,8 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
     result = []
 
     # Check if docs have any of the topics
-    if len(topics) >0:
+    if len(topics) > 0:
+        print("VSM: Checking topics")
         count = 0
         doc_map = class_acc.get_doc_map()
         for doc in rankedDictList:
