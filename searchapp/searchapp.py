@@ -88,12 +88,20 @@ def handleQuery():
     else:
         print("No match for Corpus!!!!!")
 
+    # spelling correction
+    if model == 'boolean':
+        corrected_query = spelling_correction.check_spelling_bool(query, corpus)
+    elif model == 'vsm':
+        corrected_query = spelling_correction.check_spelling_vsm(query, corpus)
+
+    if corrected_query is not None:
+        query = corrected_query
+
     if model == "vsm" and expand_query == "on":
         rochio_addition = loc_query_expan.local_expan(query, corpus, weight=1)
     elif model == "vsm":
         rochio_addition = loc_query_expan.local_expan(query, corpus, weight=0)
     original_query = query
-    print("Rocchio additions:", rochio_addition)
 
     if expand_query == "on":
         query = glob_query_expan.expand_query(query, model, 5, all_lemmas, corpus, 0.75)
@@ -115,12 +123,19 @@ def handleQuery():
         print("Boolean")
         print("--------------------------------")
     elif model == "vsm":
+        print("Rocchio additions:", rochio_addition)
         docs = rank.rank(query + rochio_addition, original_query, 10, corpus, False, topics)
         print("--------------------------------")
         print("VSM")
         print("--------------------------------")
-    
-    jsonDocs = jsonify(docs)
+
+    result = {
+        'docs': docs
+    }
+    if corrected_query is not None:
+        result['corrected_query'] = corrected_query
+
+    jsonDocs = jsonify(result)
     return jsonDocs
 
 

@@ -27,6 +27,8 @@ function querySubmit(ev) {
     divDocList.innerHTML = '';
     let spinner = document.getElementById("spinner");
     spinner.style.display = "block";
+    let divSpellCorrection = document.getElementById('spellCorrection');
+    divSpellCorrection.innerHTML = "";
 
     fetch(baseURL + "docs", {
         method: 'POST',
@@ -44,7 +46,18 @@ function querySubmit(ev) {
 
         spinner.style.display = "none";
 
-        data.forEach(doc => {
+        if (data.length === 0) divDocList.innerHTML = "<p><strong>There are no results for this query :/</strong></p>";
+
+        if (data.corrected_query) {
+            divSpellCorrection.innerHTML = "<p>Query corrected to <strong>" + data.corrected_query + "</strong> (click to continue search with me)</p>";
+            divSpellCorrection.value = data.corrected_query;
+            divSpellCorrection.addEventListener("click", () => {
+                inputQuery.value = divSpellCorrection.value;
+            });
+        }
+
+        let docs = data.docs;
+        docs.forEach(doc => {
             newDiv = document.createElement("div")
             newDiv.setAttribute("class", "doc")
             divDocList.appendChild(newDiv)
@@ -108,68 +121,6 @@ function handleRelevanceFeedback(event) {
 // Bind form to querySubmit()
 var form = document.getElementById('query');
 form.addEventListener('submit', querySubmit);
-
-var spellDataList = document.getElementById('spellList');
-
-// Disabled spellcheck
-// Bind form to spellCheck()
-// let inputQuery = document.getElementById('inputQuery');
-// inputQuery.addEventListener('input', spellCheck);
-// let spellTitle = document.getElementById('spellTitle');
-
-// window.addEventListener("load", () => {
-//     let input = document.getElementById('inputQuery');
-//     input.addEventListener("input", (event) => {
-//         spellCheck(event);
-//     });
-//
-//     window.spellCheckRequests = new XMLHttpRequest();
-// });
-
-/*
-* Handle Spell check
-* EventListener for inputQuery input
-* Posts query then transforms returned data to option elements that are appended
-* to a datalist that is bound to the input.
-*/
-function spellCheck(event) {
-    let input = event.target;
-    let spellList = document.getElementById('spellList');
-    let min_chars = 1;
-    let model = document.getElementById('boolButton').checked ? 'bool' : 'vsm';
-    let corpus = document.getElementById('coursesButton').checked ? 'courses' : 'reuters';
-
-    if (input.value.length < min_chars) {
-        window.spellCheckRequests.abort();
-        spellTitle.style.display = "none";
-        spellList.innerHTML = '';
-    }
-    else {
-        spellTitle.style.display = "block";
-        window.spellCheckRequests.abort();
-        window.spellCheckRequests.onreadystatechange = () => {
-            if (window.spellCheckRequests.readyState == 4 && window.spellCheckRequests.status == 200) {
-                let response = JSON.parse(window.spellCheckRequests.responseText);
-                spellList.innerHTML = '';
-
-                if (response.length == 0) spellTitle.style.display = "none";
-
-                response.forEach( item => {
-                    console.log(item);
-                    let option = document.createElement('li');
-                    let text = document.createTextNode(item);
-                    option.appendChild(text);
-                    option.addEventListener("click", () => {
-                        inputQuery.value = option.innerHTML;
-                    });
-                    spellList.appendChild(option);
-                });
-            }
-        };
-        window.spellCheckRequests.open('GET', '/spell?query=' + input.value + '&model=' + model + '&corpus=' + corpus, true);
-        window.spellCheckRequests.send();
-    }
-}
 
 // inspired by https://stackoverflow.com/questions/24386354/execute-js-code-after-pressing-the-spacebar
 inputQuery.onkeyup = (e) => {

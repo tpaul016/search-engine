@@ -9,7 +9,6 @@ from .. langproc import langProcess
 from .. knn import classified_acc as class_acc
 from .. relevance_feedback import relevance_index_access as relev
 
-
 def buildDF(query_list, inverIndex, need_topics):
     """Create new DataFrame with entries containing tfidf weights
 
@@ -58,7 +57,7 @@ def buildDF(query_list, inverIndex, need_topics):
     return df
 
 
-def preproc_query(query, inverIndex):
+def preproc_query(query, inverIndex, corpus):
     """ Convert query to list of strings and a vector
 
     Args:
@@ -78,17 +77,16 @@ def preproc_query(query, inverIndex):
                 ord_dict[word] += 1
             else:
                 ord_dict[word] = 1
-        #else:
-        #    print("Dropped:", word)
-            
+
     cleaned_query_list = []
     query_vector = []
     for key, value in ord_dict.items():
         cleaned_query_list.append(key)
         query_vector.append(value)
+
     return cleaned_query_list, query_vector
 
-def preproc_weighted_query(query, inverIndex):
+def preproc_weighted_query(query, inverIndex, corpus):
     """ Convert weighted query to list of strings and a vector
 
     Args:
@@ -110,14 +108,13 @@ def preproc_weighted_query(query, inverIndex):
                     ord_dict[word] += float(elem)
                 else:
                     ord_dict[word] = float(elem)
-            else:
-                print("Dropped:", elem)
 
     cleaned_query_list = []
     query_vector = []
     for key, value in ord_dict.items():
         cleaned_query_list.append(key)
         query_vector.append(value)
+
     return cleaned_query_list, query_vector
 
 def tfidf(tf, N, docFreq):
@@ -244,10 +241,10 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
     inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
     if "(" in query:
         # Weighted Query
-        query_list, query_vec = preproc_weighted_query(query, inverIndex)
+        query_list, query_vec = preproc_weighted_query(query, inverIndex, corpus)
     else:
         # Unweighted query
-        query_list, query_vec = preproc_query(query, inverIndex)
+        query_list, query_vec = preproc_query(query, inverIndex, corpus)
     #print(query_list, query_vec)
     df = buildDF(query_list, inverIndex, need_topics)
     rows, columns = df.shape
@@ -285,4 +282,3 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
         result = rankedDictList[0:amount]
 
     return(result)
-
