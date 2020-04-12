@@ -42,7 +42,7 @@ def buildDF(query_list, inverIndex, need_topics):
                 if topic is None:
                     continue
 
-            if not index_map.get(doc_id):
+            if doc_id not in index_map:
                 # Add new row to our temp array
                 new_row = [0] * len(query_list)
                 temp_arr.append(new_row)
@@ -183,24 +183,26 @@ def adjust_weight(original_query, query_vec, corpus, alpha, beta, gamma, df):
             
             term2 = []
             term3 = []
-            for rel_tfidf, non_rel_tfidf in zip(rel_sum, non_rel_sum):
-                if num_rel_docs > 0:
+            if num_rel_docs != 0:
+                for rel_tfidf in rel_sum:
                     # Create term2 vector
                     # beta*(1/|Dr|)*Sum{dj in rel}(dj)
                     term2.append(rel_tfidf * beta * (1/num_rel_docs))
-                else:
-                    term2.append(0)
-                if num_non_rel > 0:
+            else:
+                term2 = [0]*len(query_vec)
+
+            if num_non_rel != 0:
+                for non_rel_tfidf in non_rel_sum:
                     # Create term3 vector
                     # gamma*(1/|Dnr|)*Sum{dj in non rel}(dj)
                     term3.append(-non_rel_tfidf * gamma * (1/num_non_rel))
-                else:
-                    term3.append(0)
+            else:
+                term3 = [0]*len(query_vec)
 
             # Create term 1 vector
             # alpha * q0
             term1 = [num * alpha for num in query_vec]
-            #print("Rocchio:") 
+            #print("Rocchio:")
             #print("term1:", term1)
             #print("term2:", term2)
             #print("term3:", term3)
