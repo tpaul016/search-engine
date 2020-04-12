@@ -93,7 +93,6 @@ def handleQuery():
     elif model == "vsm":
         rochio_addition = loc_query_expan.local_expan(query, corpus, weight=0)
     original_query = query
-    print("Rocchio additions:", rochio_addition)
 
     if expand_query == "on":
         query = glob_query_expan.expand_query(query, model, 5, all_lemmas, corpus, 0.75)
@@ -115,6 +114,7 @@ def handleQuery():
         print("Boolean")
         print("--------------------------------")
     elif model == "vsm":
+        print("Rocchio additions:", rochio_addition)
         docs, corrected_query = rank.rank(query + rochio_addition, original_query, 10, corpus, False, topics)
         print("--------------------------------")
         print("VSM")
