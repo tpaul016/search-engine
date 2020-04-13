@@ -30,14 +30,14 @@ def local_expan(query, corpus, weight):
                 if add_weight:
                     addition += " " + word + " (1)"
                     added += 1
-                    if added == 6:
+                    if added == 12:
                         break
                 else:
                     addition += " " + word
                     added += 1
-                    if added == 6:
+                    if added == 12:
                         break
-            if added == 6:
+            if added == 12:
                 break
         return addition
     else:
