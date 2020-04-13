@@ -50,6 +50,8 @@ pytz==2019.3
 six==1.14.0
 soupsieve==1.9.5
 Werkzeug==0.16.0
+Flask-Cors==3.0.8
+strsim==0.0.3
 ```
 
 #### Automated installation of external dependencies with pip and virtualenv
