@@ -7,6 +7,7 @@ from .. cor_access import corpus_enum
 
 
 def expand_query(query, model, senses, all_lemmas, corpus, syn_weight):
+    print("Global Expansion: Input:", query)
     """
         Generate a new query for specified model with expansions
 
@@ -31,12 +32,15 @@ def expand_query(query, model, senses, all_lemmas, corpus, syn_weight):
                 elif model == "boolean":
                     # Substitute in our expansion to where the word was
                     # origininally
-                    sub = gen_replacement_bool(word, synonyms)
-                    new_query = new_query.replace(word, sub)
+                    if word not in used:
+                        sub = gen_replacement_bool(word, synonyms)
+                        #Inspired from https://stackoverflow.com/questions/17730788/search-and-replace-with-whole-word-only-option
+                        new_query = re.sub(r"\b%s\b" % word, sub, new_query)
+                        used.append(word)
                 else:
                     print("glob_query: Invalid model!!!")
         else:
-            print("Global Expansion: Word not in index ", word)
+            print("Global Expansion: word:", word, "is not in all_lemmas, dropping!")
 
     return new_query
 
@@ -52,6 +56,7 @@ def get_synonyms(word, senses, inverIndex):
 
     # Remove words not in our index
     synonyms = remove_words_not_in_index(word, synonyms, inverIndex)
+    synonyms = synonyms[0:5]
     return synonyms
 
 
@@ -109,11 +114,14 @@ def gen_replacement_bool(word, synonyms):
         return word
 
     replacement = "(" + word + " OR " + synonyms[0] + ")"
+    added = [synonyms[0]]
     for i, syn in enumerate(synonyms):
         # We've already added the first synonym
         if i == 0:
             continue
-        replacement = "(" + replacement + " OR " + syn + ")"
+        if syn not in added:
+            replacement = "(" + replacement + " OR " + syn + ")"
+            added.append(syn)
     return replacement
 
 def clean_query_vsm(query):
