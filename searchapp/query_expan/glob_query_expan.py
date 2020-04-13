@@ -32,8 +32,10 @@ def expand_query(query, model, senses, all_lemmas, corpus, syn_weight):
                 elif model == "boolean":
                     # Substitute in our expansion to where the word was
                     # origininally
+                    print(word)
                     sub = gen_replacement_bool(word, synonyms)
-                    new_query = new_query.replace(word, sub)
+                    #Inspired from https://stackoverflow.com/questions/17730788/search-and-replace-with-whole-word-only-option
+                    new_query = re.sub(r"\b%s\b" % word, sub, new_query)
                 else:
                     print("glob_query: Invalid model!!!")
         else:
@@ -111,11 +113,14 @@ def gen_replacement_bool(word, synonyms):
         return word
 
     replacement = "(" + word + " OR " + synonyms[0] + ")"
+    added = [synonyms[0]]
     for i, syn in enumerate(synonyms):
         # We've already added the first synonym
         if i == 0:
             continue
-        replacement = "(" + replacement + " OR " + syn + ")"
+        if syn not in added:
+            replacement = "(" + replacement + " OR " + syn + ")"
+            added.append(syn)
     return replacement
 
 def clean_query_vsm(query):
