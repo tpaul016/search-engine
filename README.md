@@ -76,16 +76,6 @@ flask run
 ```
 Reference - https://flask.palletsprojects.com/en/1.1.x/quickstart/
 
-## Rebuilding the Index with Stopword, Stemming and Normalization toggled
-- The file searchapp/searchapp.py contains the code snippet (Line 23):
-```{python}
-# README: Change booleans here to toggle stopword, stemming and normalization respectively
-inverIndex = indexAndDictBuilder.buildIndex("searchapp/cor_pre_proc/corpus", True, True, True)
-```
-1. Modify the Boolean parameters to toggle: Stopword, Stemming and Normalization respectively as stated in the code snippet
-2. Rerun the application using the instructions found in the previous section **Running the application**
-3. The inverted index is stored in a file named *index.json*. The Bigram index is stored in a file named *biIndex.json*.
-    - These files are located in searchapp/index_and_dict/
 # End of Instructions for the Grader
 
 # Developer Instructions

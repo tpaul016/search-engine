@@ -21,6 +21,7 @@ def create_app(test_config=None):
         nltk.download('punkt')  # Required for word tokenize
         nltk.download('stopwords')  # Required for stopword set
         nltk.download('wordnet')
+        print("Ready")
 
         #print("Creating app ...")
         #pre_processing.createCourseCorpus("searchapp/cor_pre_proc/")
