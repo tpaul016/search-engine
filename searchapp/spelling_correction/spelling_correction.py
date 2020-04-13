@@ -4,19 +4,30 @@ import heapq
 from searchapp.index_and_dict import indexAccess, indexAndDictBuilder
 from searchapp.cor_access import corpus_enum
 import re
-from nltk.metrics import edit_distance
+from similarity.weighted_levenshtein import WeightedLevenshtein
+from similarity.weighted_levenshtein import CharacterSubstitutionInterface
 
 # for testing
 insert_costs = np.ones(128, dtype=np.float64)
 
+# inspired by https://pypi.org/project/strsim/#weighted-levenshtein
+# lower substitution costs for vowels
+class CharacterSubstitution(CharacterSubstitutionInterface):
+    def cost(self, c0, c1):
+        if c0 in 'aeiou' and c1 in 'aeiou':
+            return 0.5
+        return 1.0
+
 # inspired by https://docs.python.org/3/library/heapq.html#heapq.nsmallest
 def construct_heap(index, input):
     h = []
+    weighted_levenshtein = WeightedLevenshtein(CharacterSubstitution())
+
     for value in index:
         try:
             pattern = re.compile('[\W_]*[0-9]*', re.UNICODE) # inspired by https://stackoverflow.com/questions/1276764/stripping-everything-but-alphanumeric-chars-from-a-string-in-python
             value = pattern.sub('', value)
-            dist = edit_distance(input, value, substitution_cost=1, transpositions=False)
+            dist = weighted_levenshtein.distance(input, value)
         except:
             continue
         heapq.heappush(h, (dist, value))
