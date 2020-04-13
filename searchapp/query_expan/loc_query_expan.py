@@ -24,12 +24,21 @@ def local_expan(query, corpus, weight):
         if weight != 0:
             add_weight = True
         
+        added = 0
         for doc in relev_docs:
             for word in doc_map[doc + ".xml"]:
                 if add_weight:
                     addition += " " + word + " (1)"
+                    added += 1
+                    if added == 6:
+                        break
                 else:
                     addition += " " + word
+                    added += 1
+                    if added == 6:
+                        break
+            if added == 6:
+                break
         return addition
     else:
         return addition
