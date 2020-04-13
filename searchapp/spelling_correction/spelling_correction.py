@@ -60,7 +60,7 @@ def check_spelling_bool(query, corpus):
         rear_pars_num = term.count(')')
         term = term.replace(')', '')
 
-        if term == 'AND' or term == 'OR' or term == 'AND_NOT':
+        if term == 'AND' or term == 'OR' or term == 'AND_NOT' or "*" in term:
             continue
 
         processed_term, ok = indexAndDictBuilder.preprocToken(term, stopword=False, stem=True, norm=True)
