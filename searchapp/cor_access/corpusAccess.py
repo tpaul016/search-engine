@@ -26,8 +26,10 @@ def parseReutersDocId(docId):
 def getDoc(docId, corpus):
     if corpus == Corpus.COURSES:
         newDocId = parseCoursesDocId(docId)
+        file_path = "corpus"
     elif corpus == Corpus.REUTERS:
         newDocId = docId
+        file_path = "reuters/processed"
     else:
         # Should never hit this
         print("corpusAccess: Fatal error no match")
@@ -35,7 +37,7 @@ def getDoc(docId, corpus):
 
     file_ending = ".xml"
     fileName = newDocId + file_ending
-    path_to_corpus = os.path.join(os.getcwd(), 'searchapp', 'cor_pre_proc', corpus.value, fileName)
+    path_to_corpus = os.path.join(os.getcwd(), 'searchapp', 'cor_pre_proc', file_path, fileName)
 
     with open(path_to_corpus) as f:
         soup = BeautifulSoup(f, "xml")
