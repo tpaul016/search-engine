@@ -233,13 +233,11 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
     """
 
     if corpus is corpus_enum.Corpus.COURSES:
-        file_name = 'courseIndex.json'
         corpus_str = "courses"
     elif corpus is corpus_enum.Corpus.REUTERS:
-        file_name = 'reutersIndex.json'
         corpus_str = "reuters"
 
-    inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
+    inverIndex = indexAccess.getInvertedIndex(corpus)
     if "(" in query:
         # Weighted Query
         query_list, query_vec = preproc_weighted_query(query, inverIndex, corpus)

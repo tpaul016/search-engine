@@ -91,13 +91,7 @@ def get_query_documents(query, corpus):
     query = query_to_postfix(query, corpus)
     formatted_query = []
 
-    if corpus is corpus_enum.Corpus.COURSES:
-        file_name = 'courseIndex.json'
-    elif corpus is corpus_enum.Corpus.REUTERS:
-        file_name = 'reutersIndex.json'
-
-    path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', file_name)
-    index = indexAccess.getInvertedIndex(path_to_index=path_to_index)
+    index = indexAccess.getInvertedIndex(corpus)
 
     for token in query:
         if token == 'AND' or token == 'OR' or token == 'AND_NOT':
@@ -117,13 +111,7 @@ def get_query_documents(query, corpus):
 def handle_wildcard(word, corpus):
     bigrams = create_bigrams(word)
 
-    if corpus is corpus_enum.Corpus.COURSES:
-        file_name = 'courseBiIndex.json'
-    elif corpus is corpus_enum.Corpus.REUTERS:
-        file_name = 'reutersBiIndex.json'
-
-    path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', file_name)
-    bi_index = indexAccess.get_bigram_index(path_to_index=path_to_index)
+    bi_index = indexAccess.get_bigram_index(corpus)
 
     try:
         terms = (bi_index[bigrams[0]])

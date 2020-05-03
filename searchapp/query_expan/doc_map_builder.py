@@ -1,14 +1,16 @@
 from .. index_and_dict import indexAccess
 import json
 from os import getcwd, chdir
-from operator import itemgetter
+from searchapp.cor_access import corpus_enum
+
 
 def build():
-    build_top_tfidf_map("courseIndex.json", "course_top_tfidf.json")
-    build_top_tfidf_map("reutersIndex.json", "reuters_top_tfidf.json")
+    build_top_tfidf_map(corpus_enum.Corpus.COURSES, "course_top_tfidf.json")
+    build_top_tfidf_map(corpus_enum.Corpus.REUTERS, "reuters_top_tfidf.json")
 
-def build_top_tfidf_map(index_name, out_file_name):
-    inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + index_name)
+
+def build_top_tfidf_map(corpus, out_file_name):
+    inverIndex = indexAccess.getInvertedIndex(corpus)
     doc_map = {}
     for word, val in inverIndex.items():
         for doc in val["docs"]:
