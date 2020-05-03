@@ -6,12 +6,7 @@ def get_suggestions(query, model, corpus, n_suggestions):
     if not ok:
         return []
 
-    if corpus == corpus_enum.Corpus.COURSES:
-        bigram_path = 'searchapp/bigram_language_model/courses_bigram_language_model.json'
-    elif corpus == corpus_enum.Corpus.REUTERS:
-        bigram_path = 'searchapp/bigram_language_model/reuters_bigram_language_model.json'
-
-    bigram_model = indexAccess.get_bigram_index(bigram_path)
+    bigram_model = indexAccess.get_bigram_model(corpus)
 
     try:
         suggestions = list(bigram_model[formatted_query]['conditional_words'].keys())[:n_suggestions]

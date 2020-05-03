@@ -31,5 +31,18 @@ def get_bigram_index(corpus: corpus_enum.Corpus):
     path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', file_name)
 
     with open(path_to_index, 'r') as f:
-        inverIndex = json.load(f)
-    return inverIndex
+        bi_index = json.load(f)
+    return bi_index
+
+def get_bigram_model(corpus: corpus_enum.Corpus):
+    if corpus == corpus_enum.Corpus.COURSES:
+        bigram_path = 'searchapp/bigram_language_model/courses_bigram_language_model.json'
+    elif corpus == corpus_enum.Corpus.REUTERS:
+        bigram_path = 'searchapp/bigram_language_model/reuters_bigram_language_model.json'
+    else:
+        print("Error: invalid corpus provided")
+        bigram_path = ""
+
+    with open(bigram_path, 'r') as f:
+        bigram_model = json.load(f)
+    return bigram_model
