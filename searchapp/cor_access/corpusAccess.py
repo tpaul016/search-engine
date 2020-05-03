@@ -5,50 +5,46 @@ from nltk.data import load
 from bs4 import BeautifulSoup
 from .corpus_enum import Corpus
 
-def parseCoursesDocId(docId):
+
+def parse_courses_docId(docId):
     # matches will contain ['charstring', 'number']
     match = re.match('([a-zA-Z]+)([0-9]+)', docId)
     # TODO: Add error handling if docId is incorrect
-    if match == None:
+    if match is None:
         print("corpusAccess: Regex got no match!!!")
 
-    lowerDepartment = match.group(1).lower()
-    return lowerDepartment + match.group(2)
+    lower_department = match.group(1).lower()
+    return lower_department + match.group(2)
 
-def parseReutersDocId(docId):
-    # matches will contain ['charstring', 'number']
-    match = re.match('reuters-', docId)
-    # TODO: Add error handling if docId is incorrect
-    assert not match == None
-    lowerDepartment = match.group(1).lower()
-    return lowerDepartment + match.group(2)
 
-def getDoc(docId, corpus):
+def get_doc(docId, corpus):
     if corpus == Corpus.COURSES:
-        newDocId = parseCoursesDocId(docId)
+        new_docId = parse_courses_docId(docId)
+        file_path = "corpus"
     elif corpus == Corpus.REUTERS:
-        newDocId = docId
+        new_docId = docId
+        file_path = "reuters/processed"
     else:
         # Should never hit this
         print("corpusAccess: Fatal error no match")
         sys.exit(-1)
 
     file_ending = ".xml"
-    fileName = newDocId + file_ending
-    path_to_corpus = os.path.join(os.getcwd(), 'searchapp', 'cor_pre_proc', corpus.value, fileName)
+    file_name = new_docId + file_ending
+    path_to_corpus = os.path.join(os.getcwd(), 'searchapp', 'cor_pre_proc', file_path, file_name)
 
     with open(path_to_corpus) as f:
         soup = BeautifulSoup(f, "xml")
 
     if corpus == Corpus.COURSES:
         document = {
-            "docId": newDocId,
+            "docId": new_docId,
             "title": soup.title.string,
             "descr": soup.desc.string
         }
     elif corpus == Corpus.REUTERS:
         document = {
-            "docId": newDocId,
+            "docId": new_docId,
             "title": soup.title.string,
             "topics": soup.topics.string,
             "body": soup.body.string
@@ -60,20 +56,20 @@ def getDoc(docId, corpus):
     return document
 
 
-def getContentsReuters(docId):
-    doc = getDoc(docId, Corpus.REUTERS)
+def get_contents_reuters(docId):
+    doc = get_doc(docId, Corpus.REUTERS)
 
     return doc["body"]
 
 
-def getTopicsReuters(docId):
-    doc = getDoc(docId, Corpus.REUTERS)
+def get_topics_reuters(docId):
+    doc = get_doc(docId, Corpus.REUTERS)
 
     return doc["topics"]
 
 
-def getDocExcerpt(docId, corpus):
-    doc = getDoc(docId, corpus)
+def get_doc_excerpt(docId, corpus):
+    doc = get_doc(docId, corpus)
 
     if corpus == Corpus.COURSES:
         text = doc["descr"]
@@ -90,15 +86,9 @@ def getDocExcerpt(docId, corpus):
 
     return excerpt
 
-def getDocList(docIdList, corpus):
-    documentList = []
-    for docId in docIdList:
-        documentList.append(getDoc(docId, corpus))
-    return documentList
 
-        
-        
-
-
-
-
+def get_doc_list(doc_id_list, corpus):
+    document_list = []
+    for docId in doc_id_list:
+        document_list.append(get_doc(docId, corpus))
+    return document_list

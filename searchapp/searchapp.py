@@ -61,7 +61,7 @@ def index():
 @app.route('/docs/<corpus>/<docId>')
 def getDocument(corpus, docId):
     corpus_e = get_corpus_enum(corpus)
-    document = corpusAccess.getDoc(docId, corpus_e)
+    document = corpusAccess.get_doc(docId, corpus_e)
 
     if corpus_e is corpus_enum.Corpus.COURSES:
         return render_template('document.html', docId=document["docId"], title=document["title"], descr=document["descr"])

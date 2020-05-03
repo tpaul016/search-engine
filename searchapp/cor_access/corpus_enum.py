@@ -2,5 +2,5 @@ from enum import Enum
 
 
 class Corpus(Enum):
-    COURSES = 'corpus'
-    REUTERS = 'reuters/processed'
+    COURSES = 'courses'
+    REUTERS = 'reuters'
