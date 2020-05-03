@@ -91,13 +91,7 @@ def get_query_documents(query, corpus):
     query = query_to_postfix(query, corpus)
     formatted_query = []
 
-    if corpus is corpus_enum.Corpus.COURSES:
-        file_name = 'courseIndex.json'
-    elif corpus is corpus_enum.Corpus.REUTERS:
-        file_name = 'reutersIndex.json'
-
-    path_to_index = os.path.join(os.getcwd(), 'searchapp', 'index_and_dict', file_name)
-    index = indexAccess.getInvertedIndex(path_to_index=path_to_index)
+    index = indexAccess.getInvertedIndex(corpus)
 
     for token in query:
         if token == 'AND' or token == 'OR' or token == 'AND_NOT':

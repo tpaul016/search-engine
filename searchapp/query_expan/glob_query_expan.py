@@ -89,11 +89,7 @@ def gen_query_vsm(word, synonyms, syn_weight):
 
 
 def getIndexAndCleanQuery(model, corpus, query):
-    if corpus is corpus_enum.Corpus.COURSES:
-        file_name = 'courseIndex.json'
-    elif corpus is corpus_enum.Corpus.REUTERS:
-        file_name = 'reutersIndex.json'
-    inverIndex = indexAccess.getInvertedIndex('searchapp/index_and_dict/' + file_name)
+    inverIndex = indexAccess.getInvertedIndex(corpus)
 
     if model == "vsm":
         words = clean_query_vsm(query)

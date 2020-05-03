@@ -11,7 +11,7 @@ def get_suggestions(query, model, corpus, n_suggestions):
     elif corpus == corpus_enum.Corpus.REUTERS:
         bigram_path = 'searchapp/bigram_language_model/reuters_bigram_language_model.json'
 
-    bigram_model = indexAccess.getInvertedIndex(bigram_path)
+    bigram_model = indexAccess.get_bigram_index(bigram_path)
 
     try:
         suggestions = list(bigram_model[formatted_query]['conditional_words'].keys())[:n_suggestions]

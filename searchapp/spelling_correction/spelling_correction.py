@@ -46,13 +46,7 @@ def check_spelling_bool(query, corpus):
     corrected_query = query_list[:]
     spelling_error = False
 
-    if corpus is corpus_enum.Corpus.COURSES:
-        file_name = 'courseIndex.json'
-    elif corpus is corpus_enum.Corpus.REUTERS:
-        file_name = 'reutersIndex.json'
-
-    path_to_index = os.path.join(os.getcwd(), 'searchapp','index_and_dict', file_name)
-    index = indexAccess.getInvertedIndex(path_to_index=path_to_index)
+    index = indexAccess.getInvertedIndex(corpus)
 
     for i, term in enumerate(query_list):
         front_pars_num = term.count('(')
@@ -91,13 +85,7 @@ def check_spelling_vsm(query, corpus):
     corrected_query = query_list[:]
     spelling_error = False
 
-    if corpus is corpus_enum.Corpus.COURSES:
-        file_name = 'courseIndex.json'
-    elif corpus is corpus_enum.Corpus.REUTERS:
-        file_name = 'reutersIndex.json'
-
-    path_to_index = os.path.join(os.getcwd(), 'searchapp','index_and_dict', file_name)
-    index = indexAccess.getInvertedIndex(path_to_index=path_to_index)
+    index = indexAccess.getInvertedIndex(corpus)
 
     for i, term in enumerate(query_list):
         processed_term, ok = indexAndDictBuilder.preprocToken(term, stopword=False, stem=True, norm=True)
