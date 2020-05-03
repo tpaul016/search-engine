@@ -38,7 +38,7 @@ def buildDF(query_list, inverIndex, need_topics):
             # Only interested in documents that have topics (kNN)
             if need_topics:
                 split_doc_id = doc_id.split(".")[0]
-                topic = corpusAccess.getTopicsReuters(split_doc_id)
+                topic = corpusAccess.get_topics_reuters(split_doc_id)
                 if topic is None:
                     continue
 
@@ -263,7 +263,7 @@ def rank(query, original_query, amount, corpus, need_topics, topics):
         docVec = row.to_numpy()
         score = cosSim(query_vec, docVec, corpus)
         docId = row.name.split(".")[0]
-        excerpt = corpusAccess.getDocExcerpt(docId, corpus)
+        excerpt = corpusAccess.get_doc_excerpt(docId, corpus)
         newDict = {"docId": docId, "excerpt": excerpt, "score": score} 
         rankedDictList.append(newDict)
 

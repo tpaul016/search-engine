@@ -23,7 +23,7 @@ def knn():
     testing_set = []
     for f in fileNameList:
         doc_id = f.split(".")[0]
-        topic = corpusAccess.getTopicsReuters(doc_id)
+        topic = corpusAccess.get_topics_reuters(doc_id)
         if topic is None:
             testing_set.append(doc_id)
         else:
@@ -38,7 +38,7 @@ def knn():
 
     # Add all the courses in the training set
     for doc in training_set:
-        topic = corpusAccess.getTopicsReuters(doc)
+        topic = corpusAccess.get_topics_reuters(doc)
         if topic is None:
             print("Doc with no topic in training set!")
             break
@@ -56,7 +56,7 @@ def classify(f):
         Classify one document
     """
     query = ""
-    body = corpusAccess.getContentsReuters(f)
+    body = corpusAccess.get_contents_reuters(f)
     tokens = nltk.word_tokenize(body)
     for token in tokens:
         # Apply same preprocessing as inverted index
@@ -77,7 +77,7 @@ def classify(f):
     cand_topics = []
     # Get all the topics from our 5 documents
     for doc in ranking:
-        topic = corpusAccess.getTopicsReuters(doc["docId"])
+        topic = corpusAccess.get_topics_reuters(doc["docId"])
         if topic is None:
             continue
         # We get the topics as a string

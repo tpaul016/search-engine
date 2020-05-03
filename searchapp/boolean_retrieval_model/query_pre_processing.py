@@ -107,7 +107,7 @@ def get_query_documents(query, corpus):
             for doc in index[token]['docs']:
                 doc_entry = {}
                 doc_entry['docId'] = doc['name'].split(".")[0]
-                doc_entry['excerpt'] = corpusAccess.getDocExcerpt(doc_entry['docId'], corpus)
+                doc_entry['excerpt'] = corpusAccess.get_doc_excerpt(doc_entry['docId'], corpus)
                 doc_entry['score'] = 1
                 docs.append(doc_entry)
             formatted_query.append(docs)
